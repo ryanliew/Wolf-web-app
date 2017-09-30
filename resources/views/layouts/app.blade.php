@@ -208,6 +208,7 @@
         .profile.player-detail {
             width: 100%;
             padding-bottom: 100%;
+            min-width: 79.5px;
         }
 
         .img-small {
@@ -251,6 +252,17 @@
 
         .instructions img, .role {
             max-width: 50px;
+        }
+
+        .game-summary {
+            padding: 15px 10px;
+            border-bottom: 1px solid white;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .ml-5 {
+            margin-left: 5px;
         }
 
     </style>

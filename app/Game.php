@@ -23,4 +23,27 @@ class Game extends Model
     {
     	return $this->users()->wherePivot('role_id', '=', '1')->first();
     }
+
+    public function getWinSideImgAttribute()
+    {
+        $img = "/img/roles/unknown.jpg";
+
+        if( $this->is_concluded )
+        {
+            $img = $this->is_good_win ? "/img/roles/villager.jpg" : "/img/roles/wolf.jpg";
+        }
+        return $img;
+    }
+
+    public function getWinSideColorAttribute()
+    {
+        $color = "grey";
+
+        if( $this->is_concluded )
+        {
+            $color = $this->is_good_win ? "#2ab27b" : "#FF5252";
+        }
+
+        return $color;
+    }
 }
