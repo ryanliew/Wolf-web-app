@@ -11,7 +11,7 @@ class Game extends Model
 
     public function users()
     {
-    	return $this->belongsToMany('App\User')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser');
+    	return $this->belongsToMany('App\User')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser')->withTimestamps();
     }
 
     public function players()

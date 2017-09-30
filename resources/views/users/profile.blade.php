@@ -1,16 +1,14 @@
 @extends('layouts.app')
 
 @section('title')
-    游戏 #{{ $game->id }}
+    我的资料
 @endsection
 
 @section('content')
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-
-            <game-details :id="{{ $game->id }}"></game-details>
-
+        <div class="col-md-8 col-md-offset-2">
+            <user-profile></user-profile>
         </div>
     </div>
 </div>

@@ -35,7 +35,7 @@ class User extends Authenticatable
 
     public function games()
     {
-        return $this->belongsToMany('App\Game')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser');
+        return $this->belongsToMany('App\Game')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser')->withTimestamps();
     }
 
     public function getScoreAttribute()
@@ -45,9 +45,14 @@ class User extends Authenticatable
 
     public function getWinRateAttribute()
     {
-        if($this->games()->count() < 0)
+        if($this->games()->count() <= 0)
             return 0;
         
         return $this->games()->where('score', '>', '0')->where('role_id', '<>', 1 )->count() / $this->games()->count() * 100;
+    }
+
+    public function getAvatarPathAttribute($avatar)
+    {
+        return asset( $avatar ? 'storage/' . $avatar : "storage/avatars/default.jpg");
     }
 }

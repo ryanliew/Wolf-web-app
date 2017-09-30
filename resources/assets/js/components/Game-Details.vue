@@ -1,25 +1,27 @@
 <template>
 	<div>
 		<div class="text-center">
-			<h4>Judge: <span v-text="this.judge.name"></span></h4>
-			<b>Instructions</b>
+			<h4>上帝: <span v-text="this.judge.name"></span></h4>
+			<p><b>指示顺序:</b></p>
+			
 			<ul class="list-inline instructions">
-				<li>Wolf ></li>
-				<li>Witch ></li>
-				<li>Fortune teller ></li>
-				<li>Hunter ></li>
-				<li>Idiot ></li>
-				<li>Demon ></li>
+				<li><img src="/img/roles/wolf.jpg"></li>
+				<li><img src="/img/roles/witch.jpg"></li>
+				<li><img src="/img/roles/fortune-teller.jpg"></li>
+				<li><img src="/img/roles/guard.jpg"></li>
+				<li><img src="/img/roles/hunter.jpg"></li>
+				<li><img src="/img/roles/idiot.jpg"></li>
+				<li><img src="/img/roles/demon.jpg"></li>
 			</ul>	
 		</div>
-		<div class="row">
-		    <div v-for="(player, index) in players" :key="player.id">
-		    	<player-details :player="player" :rolesSelection="roles" :gameId="id"></player-details>
-		    </div>
+		<div>
+			<ul class="list-inline player-list">
+		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="roles" :gameId="id" :is_concluded="game.is_concluded"></player-details>
+			</ul>
 		</div>
-		<div class="row text-center">
-			<button class="btn btn-success" @click="win('good')">Good wins</button>
-			<button class="btn btn-danger"@click="win('bad')">Bad wins</button>
+		<div class="row text-center" v-if="!game.is_concluded">
+			<button class="btn btn-success" @click="win('good')">好人获胜</button>
+			<button class="btn btn-danger"@click="win('bad')">狼人获胜</button>
 		</div>
 	</div>
 </template>
@@ -37,6 +39,7 @@
 				players: false,
 				judge: false,
 				roles: false,
+				game: false,
 			};
 		},
 
@@ -46,6 +49,8 @@
 
 		methods: {
 			fetch() {
+				axios.get('/ajax/game/' + this.id)
+					.then(this.setGame);
 				axios.get('/ajax/game/' + this.id + '/players')
 					.then(this.refresh);
 				axios.get('/ajax/game/'+ this.id + '/judge' )
@@ -56,6 +61,10 @@
 
 			refresh(response) {
 				this.players = response.data;
+			},
+
+			setGame(response) {
+				this.game = response.data;
 			},
 
 			setJudge(response) {

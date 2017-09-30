@@ -19,7 +19,7 @@ class GameController extends Controller
      */
     public function index()
     {
-        //
+        return view('games.index', ["games" => Game::latest()->get()]);
     }
 
     /**
@@ -48,7 +48,7 @@ class GameController extends Controller
 
         foreach($game->users as $key => $player)
         {
-            $game->users()->updateExistingPivot($player->id, ['seat' => $key + 1]);
+            $game->users()->updateExistingPivot($player->id, ['seat' => $key + 1, 'role_id' => 10]);
         }
 
         $game->users()->attach($request->judge, ['role_id' => 1, 'score' => 1]);

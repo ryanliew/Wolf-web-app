@@ -23,15 +23,16 @@ class AddRolesTable extends Migration
         });
 
         $roles = [
-                    ['name' => 'Judge', 'type' => 'neutral', 'score' => 5], 
-                    ['name' => 'Fortune Teller', 'type' => 'good', 'score' => 1],
-                    ['name' => 'Witch', 'type' => 'good', 'score' => 1],
-                    ['name' => 'Hunter', 'type' => 'good', 'score' => 1],
-                    ['name' => 'Villager', 'type' => 'good', 'score' => 1],
-                    ['name' => 'Wolf', 'type' => 'bad', 'score' => 2],
-                    ['name' => 'Demon', 'type' => 'bad', 'score' => 2],
-                    ['name' => 'Idiot', 'type' => 'good', 'score' => 1],
-                    ['name' => 'Guard', 'type' => 'good', 'score' => 1]
+                    ['name' => 'Judge', 'type' => 'neutral', 'score' => 1], 
+                    ['name' => 'Fortune Teller', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Witch', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Hunter', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Villager', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Wolf', 'type' => 'bad', 'score' => 3],
+                    ['name' => 'Demon', 'type' => 'bad', 'score' => 3],
+                    ['name' => 'Idiot', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Guard', 'type' => 'good', 'score' => 2],
+                    ['name' => 'Unknown', 'type' => 'default', 'score' => 0],
                 ];
         
         foreach($roles as $role):
