@@ -19,5 +19,8 @@ return [
     'guard'                 => '守卫',
     'wolf'                  => '狼人',
     'demon'                 => '恶魔',
+    'nine-tailed-fox'       => '九尾妖狐',
+    'white-wolf'            => '白狼王',
+    'magician'              => '魔术师'
 
 ];
