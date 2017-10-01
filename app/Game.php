@@ -64,4 +64,9 @@ class Game extends Model
     {
         return $query->where('score', '>', 0);
     }
+
+    public function concluded($query)
+    {
+        return $query->where('is_concluded', true);
+    }
 }

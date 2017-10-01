@@ -45,10 +45,15 @@ class User extends Authenticatable
 
     public function getWinRateAttribute()
     {
-        if($this->games()->count() <= 0)
+        if($this->total_games <= 0)
             return 0;
         
-        return $this->games()->where('score', '>', '0')->where('role_id', '<>', 1 )->count() / $this->games()->count() * 100;
+        return $this->games()->win()->playing()->count() / $this->total_games * 100;
+    }
+
+    public function getTotalGamesAttribute()
+    {
+        $this->games()->concluded()->playing()->count();
     }
 
     public function getAvatarPathAttribute($avatar)
@@ -69,7 +74,7 @@ class User extends Authenticatable
 
     public function getCountForRole($role_id)
     {
-        return $this->games()->where('role_id', $role_id)->count();
+        return $this->games()->concluded()->where('role_id', $role_id)->count();
     }
 
     public function getRateForRole($role_id)
