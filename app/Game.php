@@ -53,6 +53,11 @@ class Game extends Model
 
         return $color;
     }
+
+    public function authenticate_user($user)
+    {
+        return $this->is_concluded || !$this->players()->contains('id', $user);
+    }
     
     /***** Scopes *****/
     public function scopePlaying($query)
