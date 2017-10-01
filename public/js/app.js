@@ -43383,7 +43383,7 @@ var render = function() {
       _c("div", { staticClass: "col-xs-12" }, [
         _c("span", {
           staticClass: "name",
-          domProps: { textContent: _vm._s(this.player.name) }
+          domProps: { textContent: _vm._s(this.player.short_name) }
         })
       ])
     ]),

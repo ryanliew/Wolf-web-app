@@ -9,7 +9,7 @@
         </div>
         <div class="row">
             <div class="col-xs-12">
-                <span class="name" v-text="this.player.name"></span>
+                <span class="name" v-text="this.player.short_name"></span>
             </div>
         </div>
         <div class="row">
