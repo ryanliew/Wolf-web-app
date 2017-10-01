@@ -1,5 +1,5 @@
 {
-  "name": "Wolf",
+  "name": "狼人杀",
   "icons": [
     {
       "src": "/img/icons/launcher-icon-0-75x.png",
@@ -39,6 +39,13 @@
     }
   ],
   "start_url": "index.php",
-  "display": "standalone",
-  "orientation": "vertical"
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "manifest_version": 2,
+  "version": "1.0",
+  "version_name": "beta",
+  "description": "互怼到天明！",
+  "start_url": "/home",
+  "background_color": "black",
+
 }
