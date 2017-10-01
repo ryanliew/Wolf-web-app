@@ -10,7 +10,7 @@
 				</li>
 			</ul>
 
-			<div class="flex flex-center text-center">
+			<div class="flex flex-center justify-center text-center">
 				<b>发言玩家: <span v-text="random"></span></b>
 				<button class="btn btn-default ml-5" @click="randomSelect">重选</button>
 			</div>
