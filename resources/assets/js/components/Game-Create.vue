@@ -26,16 +26,32 @@
 		<br>
 		<div class="row">
 			<div class="col-xs-12">
-				<label>开启身份</label>
-				<fieldset class="text-center">
-					<ul class="list-inline">
-						<li class="role" v-for="(role, index) in roles" :key="role.id">
-							<input type="checkbox" :id="role.id" :value="role.id" v-model="selected_roles">
-							<label :for="role.id">
-								<img :src="role.avatar_path" class="img-responsive">
-							</label>
-						</li>
-					</ul>
+				<label>开启身份:</label>
+				<fieldset class="text-center margin-1">
+					<div class="background-good pt-1">
+						<h4>好人阵营</h4>
+						<ul class="list-inline">
+							<li class="role" v-for="(role, index) in roles" :key="role.id" v-if='role.type == "good"'>
+								<input type="checkbox" :id="role.id" :value="role.id" v-model="selected_roles">
+								<label :for="role.id">
+									<img :src="role.avatar_path" class="img-responsive">
+								</label>
+							</li>
+						</ul>
+					</div>
+					<div class="background-bad pt-1">
+						<h4>狼人阵营</h4>
+						<ul class="list-inline">
+							<li class="role" v-for="(role, index) in roles" :key="role.id" v-if='role.type == "bad"'>
+								<input type="checkbox" :id="role.id" :value="role.id" v-model="selected_roles">
+								<label :for="role.id">
+									<img :src="role.avatar_path" class="img-responsive">
+								</label>
+							</li>
+						</ul>
+					</div>
+
+
 				</fieldset>
 			</div>
 		</div>

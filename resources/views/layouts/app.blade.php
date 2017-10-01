@@ -294,6 +294,10 @@
             filter: none;
         }
 
+        .pt-1 {
+            padding: 10px 0;
+        }
+
     </style>
 </head>
 

@@ -42216,6 +42216,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -42401,62 +42417,130 @@ var render = function() {
       _vm._v(" "),
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "col-xs-12" }, [
-          _c("label", [_vm._v("开启身份")]),
+          _c("label", [_vm._v("开启身份:")]),
           _vm._v(" "),
-          _c("fieldset", { staticClass: "text-center" }, [
-            _c(
-              "ul",
-              { staticClass: "list-inline" },
-              _vm._l(_vm.roles, function(role, index) {
-                return _c("li", { key: role.id, staticClass: "role" }, [
-                  _c("input", {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.selected_roles,
-                        expression: "selected_roles"
-                      }
-                    ],
-                    attrs: { type: "checkbox", id: role.id },
-                    domProps: {
-                      value: role.id,
-                      checked: Array.isArray(_vm.selected_roles)
-                        ? _vm._i(_vm.selected_roles, role.id) > -1
-                        : _vm.selected_roles
-                    },
-                    on: {
-                      __c: function($event) {
-                        var $$a = _vm.selected_roles,
-                          $$el = $event.target,
-                          $$c = $$el.checked ? true : false
-                        if (Array.isArray($$a)) {
-                          var $$v = role.id,
-                            $$i = _vm._i($$a, $$v)
-                          if ($$el.checked) {
-                            $$i < 0 && (_vm.selected_roles = $$a.concat([$$v]))
-                          } else {
-                            $$i > -1 &&
-                              (_vm.selected_roles = $$a
-                                .slice(0, $$i)
-                                .concat($$a.slice($$i + 1)))
+          _c("fieldset", { staticClass: "text-center margin-1" }, [
+            _c("div", { staticClass: "background-good pt-1" }, [
+              _c("h4", [_vm._v("好人阵营")]),
+              _vm._v(" "),
+              _c(
+                "ul",
+                { staticClass: "list-inline" },
+                _vm._l(_vm.roles, function(role, index) {
+                  return role.type == "good"
+                    ? _c("li", { key: role.id, staticClass: "role" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.selected_roles,
+                              expression: "selected_roles"
+                            }
+                          ],
+                          attrs: { type: "checkbox", id: role.id },
+                          domProps: {
+                            value: role.id,
+                            checked: Array.isArray(_vm.selected_roles)
+                              ? _vm._i(_vm.selected_roles, role.id) > -1
+                              : _vm.selected_roles
+                          },
+                          on: {
+                            __c: function($event) {
+                              var $$a = _vm.selected_roles,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = role.id,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    (_vm.selected_roles = $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    (_vm.selected_roles = $$a
+                                      .slice(0, $$i)
+                                      .concat($$a.slice($$i + 1)))
+                                }
+                              } else {
+                                _vm.selected_roles = $$c
+                              }
+                            }
                           }
-                        } else {
-                          _vm.selected_roles = $$c
-                        }
-                      }
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("label", { attrs: { for: role.id } }, [
-                    _c("img", {
-                      staticClass: "img-responsive",
-                      attrs: { src: role.avatar_path }
-                    })
-                  ])
-                ])
-              })
-            )
+                        }),
+                        _vm._v(" "),
+                        _c("label", { attrs: { for: role.id } }, [
+                          _c("img", {
+                            staticClass: "img-responsive",
+                            attrs: { src: role.avatar_path }
+                          })
+                        ])
+                      ])
+                    : _vm._e()
+                })
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "background-bad pt-1" }, [
+              _c("h4", [_vm._v("狼人阵营")]),
+              _vm._v(" "),
+              _c(
+                "ul",
+                { staticClass: "list-inline" },
+                _vm._l(_vm.roles, function(role, index) {
+                  return role.type == "bad"
+                    ? _c("li", { key: role.id, staticClass: "role" }, [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.selected_roles,
+                              expression: "selected_roles"
+                            }
+                          ],
+                          attrs: { type: "checkbox", id: role.id },
+                          domProps: {
+                            value: role.id,
+                            checked: Array.isArray(_vm.selected_roles)
+                              ? _vm._i(_vm.selected_roles, role.id) > -1
+                              : _vm.selected_roles
+                          },
+                          on: {
+                            __c: function($event) {
+                              var $$a = _vm.selected_roles,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = role.id,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    (_vm.selected_roles = $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    (_vm.selected_roles = $$a
+                                      .slice(0, $$i)
+                                      .concat($$a.slice($$i + 1)))
+                                }
+                              } else {
+                                _vm.selected_roles = $$c
+                              }
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _c("label", { attrs: { for: role.id } }, [
+                          _c("img", {
+                            staticClass: "img-responsive",
+                            attrs: { src: role.avatar_path }
+                          })
+                        ])
+                      ])
+                    : _vm._e()
+                })
+              )
+            ])
           ])
         ])
       ]),
