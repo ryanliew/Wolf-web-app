@@ -41,11 +41,10 @@
   "start_url": "index.php",
   "display": "fullscreen",
   "orientation": "portrait",
-  "manifest_version": 2,
-  "version": "1.0",
+  "manifest_version": 3,
+  "version": "1.1",
   "version_name": "beta",
   "description": "互怼到天明！",
-  "start_url": "/home",
   "background_color": "black",
 
 }
