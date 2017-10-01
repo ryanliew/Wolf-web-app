@@ -29,8 +29,8 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    protected $append = [
-        'score'
+    protected $appends = [
+        'score', 'short_name'
     ];
 
     public function games()
@@ -81,5 +81,10 @@ class User extends Authenticatable
     {
         $total = $this->games()->playing()->count();
         return $total > 0 ? $this->getCountForRole($role_id) / $total * 100 : 0;
+    }
+
+    public function getShortNameAttribute()
+    {
+        return substr( $this->name, 0, 10 );
     }
 }
