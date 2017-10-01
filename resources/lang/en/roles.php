@@ -21,6 +21,7 @@ return [
     'demon'                 => '恶魔',
     'nine-tailed-fox'       => '九尾妖狐',
     'white-wolf'            => '白狼王',
-    'magician'              => '魔术师'
+    'magician'              => '魔术师',
+    'white-wolf'            => '毒狼'
 
 ];
