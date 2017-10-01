@@ -5,18 +5,14 @@
 			<p><b>指示顺序:</b></p>
 			
 			<ul class="list-inline instructions">
-				<li><img src="/img/roles/wolf.jpg"></li>
-				<li><img src="/img/roles/witch.jpg"></li>
-				<li><img src="/img/roles/fortune-teller.jpg"></li>
-				<li><img src="/img/roles/guard.jpg"></li>
-				<li><img src="/img/roles/hunter.jpg"></li>
-				<li><img src="/img/roles/idiot.jpg"></li>
-				<li><img src="/img/roles/demon.jpg"></li>
+				<li v-for="(role, index) in orderedRoles" :key="role.id" v-if="role.id !== 5">
+					<img :src="role.avatar_path">
+				</li>
 			</ul>	
 		</div>
 		<div>
 			<ul class="list-inline player-list">
-		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="roles" :gameId="id" :is_concluded="game.is_concluded"></player-details>
+		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :is_concluded="game.is_concluded"></player-details>
 			</ul>
 		</div>
 		<div class="row text-center" v-if="!game.is_concluded">
@@ -38,7 +34,6 @@
 			return {
 				players: false,
 				judge: false,
-				roles: false,
 				game: false,
 			};
 		},
@@ -55,8 +50,6 @@
 					.then(this.refresh);
 				axios.get('/ajax/game/'+ this.id + '/judge' )
 					.then(this.setJudge)
-				axios.get('/ajax/roles' )
-					.then(this.setRoles)
 			},
 
 			refresh(response) {
@@ -83,6 +76,12 @@
 
 			redirect() {
 				window.location.href = "/games/create";
+			}
+		},
+
+		computed: {
+			orderedRoles() {
+				return _.orderBy(this.game.roles, 'sequence');
 			}
 		}	
 

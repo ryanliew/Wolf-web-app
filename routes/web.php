@@ -18,7 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/profile', 'UserController@update')->name('profile');
+Route::get('/profile/{user}', 'UserController@update')->name('profile');
 
 Route::prefix('games')->middleware(['auth'])->group(function() {
 	Route::get('/', 'GameController@index');

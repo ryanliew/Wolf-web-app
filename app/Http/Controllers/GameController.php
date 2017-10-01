@@ -44,6 +44,8 @@ class GameController extends Controller
         
         $players = collect($request->players)->shuffle();
 
+        $game->roles()->sync($request->roles);
+
         $game->users()->sync($players->all());
 
         foreach($game->users as $key => $player)
@@ -64,6 +66,9 @@ class GameController extends Controller
      */
     public function show(Game $game)
     {
+        if( !$game->authenticate_user(auth()->id()) )
+            return back()->with('flash', '游戏还在进行中');
+
         return view('games.view', ['game' => $game]);
     }
 

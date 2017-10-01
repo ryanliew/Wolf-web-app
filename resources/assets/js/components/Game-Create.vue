@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="game-create">
 		<label>上帝:</label>
 		<v-select 
 			:debounce="500"
@@ -24,15 +24,47 @@
 
 		<label>总人数: </label> <span v-text="playerNumber"></span>
 		<br>
+		<div class="row">
+			<div class="col-xs-12">
+				<label>开启身份:</label>
+				<fieldset class="text-center margin-1">
+					<div class="panel-egypt background-good margin-1">
+						<div class="panel-body">
+							<h4>好人阵营</h4>
+							<ul class="list-inline">
+								<li class="role" v-for="(role, index) in roles" :key="role.id" v-if='role.type == "good"'>
+									<input type="checkbox" :id="role.id" :value="role.id" v-model="selected_roles">
+									<label :for="role.id">
+										<img :src="role.avatar_path" class="img-responsive">
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="panel-egypt background-bad margin-1">
+						<div class="panel-body">
+							<h4>狼人阵营</h4>
+							<ul class="list-inline">
+								<li class="role" v-for="(role, index) in roles" :key="role.id" v-if='role.type == "bad"'>
+									<input type="checkbox" :id="role.id" :value="role.id" v-model="selected_roles">
+									<label :for="role.id">
+										<img :src="role.avatar_path" class="img-responsive">
+									</label>
+								</li>
+							</ul>
+						</div>
+					</div>
+					
+				</fieldset>
+			</div>
+		</div>
 		<div class="row text-center">
 			<button class="btn btn-primary" @click="createGame">开始游戏</button>
 			<button class="btn btn-success" @click="create_player = true">增添玩家</button>
 		</div>
 
 		<div class="roles-list" v-if="create_player">
-			<h4>创建新玩家</h4>
-			<hr>
-			<input class="form-control" type="text" placeholder="Name" v-model="new_name">
+			<input class="form-control" type="text" placeholder="新玩家名字" v-model="new_name">
 			<hr>
 			<button class="btn btn-success" @click="createPlayer">确定</button>
 			<button class="btn btn-danger" @click="create_player = false">返回</button>
@@ -55,7 +87,9 @@
 				potential_players: [],
 				potential_judge: [],
 				create_player: false,
-				new_name: ""
+				new_name: "",
+				roles: [],
+				selected_roles: [],
 			};
 		},
 
@@ -65,6 +99,11 @@
 					this.potential_judge = resp.data;
 					this.players = false;
 			});
+
+			axios.get('/ajax/roles')
+				.then(resp => {
+					this.roles = resp.data;
+				});
 		},
 
 		methods: {
@@ -115,7 +154,8 @@
 				axios.post('/games/create', {
 
 					judge: this.judge.id,
-					players: players_id
+					players: players_id,
+					roles: this.selected_roles
 
 				}).then(resp => {
 					//console.log(resp);

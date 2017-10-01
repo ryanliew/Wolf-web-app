@@ -265,6 +265,39 @@
             margin-left: 5px;
         }
 
+        .background-good {
+            background: #2ab27b;
+        }
+
+        .background-bad {
+            background: #ff5252;
+        }
+
+        .game-create .role {
+            max-width: 60px;
+        }
+
+        .game-create .role label {
+            margin-top: -25px;
+        }
+
+        .game-create .role img {
+            filter: grayscale(100%);
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -ms-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+        .game-create .role input[type=checkbox]:checked + label img {
+            filter: none;
+        }
+
+        .pt-1 {
+            padding: 10px 0;
+        }
+
     </style>
 </head>
 
@@ -308,7 +341,7 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="{{ route('profile') }}">
+                                        <a href="{{ route('profile', auth()->id() ) }}">
                                             个人资料
                                         </a>
                                     <li>
@@ -331,6 +364,7 @@
         </nav>
 
         @yield('content')
+        <flash message="{{ session('flash') }}"></flash>
     </div>
 
     <!-- Scripts -->

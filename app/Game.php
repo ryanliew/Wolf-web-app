@@ -9,6 +9,8 @@ class Game extends Model
     //
     protected $guarded = [];
 
+    protected $with = ['roles'];
+
     public function users()
     {
     	return $this->belongsToMany('App\User')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser')->withTimestamps();
@@ -22,6 +24,11 @@ class Game extends Model
     public function judge()
     {
     	return $this->users()->wherePivot('role_id', '=', '1')->first();
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role')->withTimestamps();
     }
 
     public function getWinSideImgAttribute()
@@ -45,5 +52,26 @@ class Game extends Model
         }
 
         return $color;
+    }
+
+    public function authenticate_user($user)
+    {
+        return $this->is_concluded || !$this->players()->contains('id', $user);
+    }
+    
+    /***** Scopes *****/
+    public function scopePlaying($query)
+    {
+        return $query->where('role_id', '<>', 1 );
+    }
+
+    public function scopeWin($query)
+    {
+        return $query->where('score', '>', 0);
+    }
+
+    public function scopeConcluded($query)
+    {
+        return $query->where('is_concluded', true);
     }
 }
