@@ -139,6 +139,7 @@
 
         .flex-center {
             align-items: center;
+            justify-content: center;
         }
 
         .overflow-scroll {

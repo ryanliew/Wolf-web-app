@@ -75,6 +75,11 @@ class AjaxController extends Controller
 
     public function setEndGame(Request $request, Game $game)
     {
+        if( $game->players()->contains('pivot.role_id', 10) )
+        {
+            return response(204);
+        }
+
         $winning_roles = Role::where('type', $request->type)->get()->pluck('id');
         $users = $game->users()->wherePivotIn('role_id', $winning_roles)->get();
 
