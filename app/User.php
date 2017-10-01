@@ -48,12 +48,12 @@ class User extends Authenticatable
         if($this->total_games <= 0)
             return 0;
         
-        return $this->games()->win()->playing()->count() / $this->total_games * 100;
+        return $this->games()->playing()->win()->count() / $this->total_games * 100;
     }
 
     public function getTotalGamesAttribute()
     {
-        $this->games()->concluded()->playing()->count();
+        return $this->games()->where('is_concluded', 1)->playing()->count();
     }
 
     public function getAvatarPathAttribute($avatar)
