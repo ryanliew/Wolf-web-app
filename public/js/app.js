@@ -43556,21 +43556,25 @@ var render = function() {
         })
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "flex flex-center text-center" }, [
-        _c("b", [
-          _vm._v("发言玩家: "),
-          _c("span", { domProps: { textContent: _vm._s(_vm.random) } })
-        ]),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-default ml-5",
-            on: { click: _vm.randomSelect }
-          },
-          [_vm._v("重选")]
-        )
-      ])
+      _c(
+        "div",
+        { staticClass: "flex flex-center justify-center text-center" },
+        [
+          _c("b", [
+            _vm._v("发言玩家: "),
+            _c("span", { domProps: { textContent: _vm._s(_vm.random) } })
+          ]),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-default ml-5",
+              on: { click: _vm.randomSelect }
+            },
+            [_vm._v("重选")]
+          )
+        ]
+      )
     ]),
     _vm._v(" "),
     _c("div", [
