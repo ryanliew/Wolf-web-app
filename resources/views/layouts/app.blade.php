@@ -160,6 +160,10 @@
             text-align: center;
         }
 
+        .panel-egypt table tr td {
+            vertical-align: middle;
+        }
+
         .navbar-egypt {
             background: #303f9f;
             color: white;
