@@ -46,4 +46,15 @@ class Game extends Model
 
         return $color;
     }
+    
+    /***** Scopes *****/
+    public function scopePlaying($query)
+    {
+        return $query->where('role_id', '<>', 1 );
+    }
+
+    public function scopeWin($query)
+    {
+        return $query->where('score', '>', 0);
+    }
 }

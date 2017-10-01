@@ -55,4 +55,26 @@ class User extends Authenticatable
     {
         return asset( $avatar ? 'storage/' . $avatar : "storage/avatars/default.jpg");
     }
+
+    public function getWinRateForRole($role_id)
+    {
+        $count = $this->getCountForRole($role_id);
+        return $count > 0 ? $this->getWinCountForRole($role_id) / $this->getCountForRole($role_id) * 100 : 0;
+    }
+
+    public function getWinCountForRole($role_id)
+    {
+        return $this->games()->where('role_id', $role_id)->playing()->win()->count();
+    }
+
+    public function getCountForRole($role_id)
+    {
+        return $this->games()->where('role_id', $role_id)->count();
+    }
+
+    public function getRateForRole($role_id)
+    {
+        $total = $this->games()->playing()->count();
+        return $total > 0 ? $this->getCountForRole($role_id) / $total * 100 : 0;
+    }
 }

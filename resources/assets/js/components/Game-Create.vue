@@ -30,8 +30,6 @@
 		</div>
 
 		<div class="roles-list" v-if="create_player">
-			<h4>创建新玩家</h4>
-			<hr>
 			<input class="form-control" type="text" placeholder="Name" v-model="new_name">
 			<hr>
 			<button class="btn btn-success" @click="createPlayer">确定</button>

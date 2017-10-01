@@ -26,10 +26,12 @@
                                 <tr>
                                     <td>{{ $key + 1 }}</td>
                                     <td class="text-left">
-                                        <div class="flex flex-center">
-                                            <div style="background-image: url('{{ $player->avatar_path }}');" class="img-responsive img-circle profile img-small"></div>
-                                            <span>{{ $player->name }}</span>
-                                        </div>
+                                        <a href="{{ route('profile', $player->id) }}">
+                                            <div class="flex flex-center">
+                                                <div style="background-image: url('{{ $player->avatar_path }}');" class="img-responsive img-circle profile img-small"></div>
+                                                <span>{{ $player->name }}</span>
+                                            </div>
+                                        </a>
                                     </td>
                                     <td>{{ $player->score }}</td>
                                     <td>{{ round($player->win_rate, 2) }}%</td>

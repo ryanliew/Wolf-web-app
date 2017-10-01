@@ -42201,8 +42201,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 
 
@@ -42401,10 +42399,6 @@ var render = function() {
       _vm._v(" "),
       _vm.create_player
         ? _c("div", { staticClass: "roles-list" }, [
-            _c("h4", [_vm._v("创建新玩家")]),
-            _vm._v(" "),
-            _c("hr"),
-            _vm._v(" "),
             _c("input", {
               directives: [
                 {

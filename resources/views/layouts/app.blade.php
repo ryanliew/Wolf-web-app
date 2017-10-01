@@ -265,6 +265,14 @@
             margin-left: 5px;
         }
 
+        .background-good {
+            background: #2ab27b;
+        }
+
+        .background-bad {
+            background: #ff5252;
+        }
+
     </style>
 </head>
 
@@ -308,7 +316,7 @@
 
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="{{ route('profile') }}">
+                                        <a href="{{ route('profile', auth()->id() ) }}">
                                             个人资料
                                         </a>
                                     <li>
