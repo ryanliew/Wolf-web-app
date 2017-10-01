@@ -8,11 +8,17 @@
 				<li v-for="(role, index) in orderedRoles" :key="role.id" v-if="role.id !== 5">
 					<img :src="role.avatar_path">
 				</li>
-			</ul>	
+			</ul>
+
+			<div class="flex flex-center text-center">
+				<b>发言玩家: <span v-text="random"></span></b>
+				<button class="btn btn-default ml-5" @click="randomSelect">重选</button>
+			</div>
+
 		</div>
 		<div>
 			<ul class="list-inline player-list">
-		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :is_concluded="game.is_concluded"></player-details>
+		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
 			</ul>
 		</div>
 		<div class="row text-center" v-if="!game.is_concluded">
@@ -35,6 +41,7 @@
 				players: false,
 				judge: false,
 				game: false,
+				random: 0
 			};
 		},
 
@@ -46,18 +53,20 @@
 			fetch() {
 				axios.get('/ajax/game/' + this.id)
 					.then(this.setGame);
-				axios.get('/ajax/game/' + this.id + '/players')
-					.then(this.refresh);
-				axios.get('/ajax/game/'+ this.id + '/judge' )
-					.then(this.setJudge)
+				
+				
 			},
 
 			refresh(response) {
 				this.players = response.data;
+				axios.get('/ajax/game/'+ this.id + '/judge' )
+					.then(this.setJudge)
 			},
 
 			setGame(response) {
 				this.game = response.data;
+				axios.get('/ajax/game/' + this.id + '/players')
+							.then(this.refresh);
 			},
 
 			setJudge(response) {
@@ -74,15 +83,35 @@
 				}).then(this.redirect);
 			},
 
-			redirect() {
-				window.location.href = "/games/create";
+			redirect(response) {
+				if( response.data == 204 )
+					flash("请确认所有玩家的身份");
+				else
+					window.location.href = "/games/create";
+			},
+
+			randomSelect() {
+				let deadPlayers = this.players.slice();
+				var alivePlayers = _.remove(deadPlayers, function(n) {
+					return n.pivot.is_alive;
+				});
+				var key = _.random(0, alivePlayers.length - 1);
+				this.random = alivePlayers[key].name;
+			},
+
+			kill(index) {
+				this.players[index].pivot.is_alive = 0;
+			},
+
+			revive(index) {
+				this.players[index].pivot.is_alive = 1;
 			}
 		},
 
 		computed: {
 			orderedRoles() {
 				return _.orderBy(this.game.roles, 'sequence');
-			}
+			},
 		}	
 
 

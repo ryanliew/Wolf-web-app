@@ -66,6 +66,8 @@
                     user_id: this.player.id,
                     alive: this.alive
                 });
+                this.$emit('killed', this.player.id);
+
             },
 
             revive() {
@@ -75,6 +77,7 @@
                     user_id: this.player.id,
                     alive: this.alive
                 });
+                this.$emit('revived', this.player.id);
             },
 
             select(role) {
