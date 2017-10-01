@@ -44,6 +44,8 @@ class GameController extends Controller
         
         $players = collect($request->players)->shuffle();
 
+        $game->roles()->sync($request->roles);
+
         $game->users()->sync($players->all());
 
         foreach($game->users as $key => $player)

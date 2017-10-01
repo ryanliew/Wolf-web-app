@@ -273,6 +273,27 @@
             background: #ff5252;
         }
 
+        .game-create .role {
+            max-width: 60px;
+        }
+
+        .game-create .role label {
+            margin-top: -25px;
+        }
+
+        .game-create .role img {
+            filter: grayscale(100%);
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -ms-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+        }
+
+        .game-create .role input[type=checkbox]:checked + label img {
+            filter: none;
+        }
+
     </style>
 </head>
 

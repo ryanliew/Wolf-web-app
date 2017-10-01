@@ -42201,6 +42201,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -42216,7 +42231,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			potential_players: [],
 			potential_judge: [],
 			create_player: false,
-			new_name: ""
+			new_name: "",
+			roles: [],
+			selected_roles: []
 		};
 	},
 	created: function created() {
@@ -42225,6 +42242,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		axios.get('/ajax/users').then(function (resp) {
 			_this.potential_judge = resp.data;
 			_this.players = false;
+		});
+
+		axios.get('/ajax/roles').then(function (resp) {
+			_this.roles = resp.data;
 		});
 	},
 
@@ -42279,7 +42300,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			axios.post('/games/create', {
 
 				judge: this.judge.id,
-				players: players_id
+				players: players_id,
+				roles: this.selected_roles
 
 			}).then(function (resp) {
 				//console.log(resp);
@@ -42329,6 +42351,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "game-create" },
     [
       _c("label", [_vm._v("上帝:")]),
       _vm._v(" "),
@@ -42376,6 +42399,68 @@ var render = function() {
       _vm._v(" "),
       _c("br"),
       _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-xs-12" }, [
+          _c("label", [_vm._v("开启身份")]),
+          _vm._v(" "),
+          _c("fieldset", { staticClass: "text-center" }, [
+            _c(
+              "ul",
+              { staticClass: "list-inline" },
+              _vm._l(_vm.roles, function(role, index) {
+                return _c("li", { key: role.id, staticClass: "role" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.selected_roles,
+                        expression: "selected_roles"
+                      }
+                    ],
+                    attrs: { type: "checkbox", id: role.id },
+                    domProps: {
+                      value: role.id,
+                      checked: Array.isArray(_vm.selected_roles)
+                        ? _vm._i(_vm.selected_roles, role.id) > -1
+                        : _vm.selected_roles
+                    },
+                    on: {
+                      __c: function($event) {
+                        var $$a = _vm.selected_roles,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = role.id,
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 && (_vm.selected_roles = $$a.concat([$$v]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.selected_roles = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
+                        } else {
+                          _vm.selected_roles = $$c
+                        }
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c("label", { attrs: { for: role.id } }, [
+                    _c("img", {
+                      staticClass: "img-responsive",
+                      attrs: { src: role.avatar_path }
+                    })
+                  ])
+                ])
+              })
+            )
+          ])
+        ])
+      ]),
+      _vm._v(" "),
       _c("div", { staticClass: "row text-center" }, [
         _c(
           "button",
@@ -42409,7 +42494,7 @@ var render = function() {
                 }
               ],
               staticClass: "form-control",
-              attrs: { type: "text", placeholder: "Name" },
+              attrs: { type: "text", placeholder: "新玩家名字" },
               domProps: { value: _vm.new_name },
               on: {
                 input: function($event) {
@@ -42538,10 +42623,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
 
 
 
@@ -42554,7 +42635,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		return {
 			players: false,
 			judge: false,
-			roles: false,
 			game: false
 		};
 	},
@@ -42568,7 +42648,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			axios.get('/ajax/game/' + this.id).then(this.setGame);
 			axios.get('/ajax/game/' + this.id + '/players').then(this.refresh);
 			axios.get('/ajax/game/' + this.id + '/judge').then(this.setJudge);
-			axios.get('/ajax/roles').then(this.setRoles);
 		},
 		refresh: function refresh(response) {
 			this.players = response.data;
@@ -42589,6 +42668,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		redirect: function redirect() {
 			window.location.href = "/games/create";
+		}
+	},
+
+	computed: {
+		orderedRoles: function orderedRoles() {
+			return _.orderBy(this.game.roles, 'sequence');
 		}
 	}
 
@@ -42943,7 +43028,17 @@ var render = function() {
       _vm._v(" "),
       _vm._m(0),
       _vm._v(" "),
-      _vm._m(1)
+      _c(
+        "ul",
+        { staticClass: "list-inline instructions" },
+        _vm._l(_vm.orderedRoles, function(role, index) {
+          return role.id !== 5
+            ? _c("li", { key: role.id }, [
+                _c("img", { attrs: { src: role.avatar_path } })
+              ])
+            : _vm._e()
+        })
+      )
     ]),
     _vm._v(" "),
     _c("div", [
@@ -42955,7 +43050,7 @@ var render = function() {
             key: player.id,
             attrs: {
               player: player,
-              rolesSelection: _vm.roles,
+              rolesSelection: _vm.game.roles,
               gameId: _vm.id,
               is_concluded: _vm.game.is_concluded
             }
@@ -43001,28 +43096,6 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("p", [_c("b", [_vm._v("指示顺序:")])])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("ul", { staticClass: "list-inline instructions" }, [
-      _c("li", [_c("img", { attrs: { src: "/img/roles/wolf.jpg" } })]),
-      _vm._v(" "),
-      _c("li", [_c("img", { attrs: { src: "/img/roles/witch.jpg" } })]),
-      _vm._v(" "),
-      _c("li", [
-        _c("img", { attrs: { src: "/img/roles/fortune-teller.jpg" } })
-      ]),
-      _vm._v(" "),
-      _c("li", [_c("img", { attrs: { src: "/img/roles/guard.jpg" } })]),
-      _vm._v(" "),
-      _c("li", [_c("img", { attrs: { src: "/img/roles/hunter.jpg" } })]),
-      _vm._v(" "),
-      _c("li", [_c("img", { attrs: { src: "/img/roles/idiot.jpg" } })]),
-      _vm._v(" "),
-      _c("li", [_c("img", { attrs: { src: "/img/roles/demon.jpg" } })])
-    ])
   }
 ]
 render._withStripped = true
