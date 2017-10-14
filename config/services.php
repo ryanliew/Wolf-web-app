@@ -35,4 +35,10 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'facebook' => [
+        'client_id' => '744219689121049',
+        'client_secret' => '1beefad1e2604035e6a6b6f61f88ecfc',
+        'redirect' => 'http://wolf55.local/auth/login/facebook/callback',
+    ]
+
 ];
