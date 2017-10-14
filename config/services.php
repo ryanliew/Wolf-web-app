@@ -36,9 +36,9 @@ return [
     ],
 
     'facebook' => [
-        'client_id' => '744219689121049',
-        'client_secret' => '1beefad1e2604035e6a6b6f61f88ecfc',
-        'redirect' => 'http://wolf55.local/auth/login/facebook/callback',
+        'client_id' => env('FACEBOOK_APP_ID'),
+        'client_secret' => env('FACEBOOK_APP_SECRET'),
+        'redirect' => env('FACEBOOK_APP_CALLBACK'),
     ]
 
 ];
