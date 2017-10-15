@@ -8,12 +8,16 @@ class UserRepository {
 
 	public function findByUsernameOrCreate($userData)
 	{
-		return User::firstOrCreate(
+		$user = User::firstOrCreate(
 			[
 				'email' =>	$userData->email,
 				'password' => bcrypt('123456')
 			]
 		);
+
+		$user->update(['avatar_path' => $userData->avatar, 'name' => $userData->name]);
+
+		return $user;
 	}
 
 }
