@@ -9,7 +9,8 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-        
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
         <!-- Add to homescreen manifest -->
         <link rel="manifest" href="manifest.json"> 
         <link rel="icon" sizes="192x192" href="/img/icons/launcher-icon-4x.png"> 
@@ -129,6 +130,18 @@
                 color: white;
             }
 
+            .btn-facebook {
+                background: #3b5998;
+                color: white;
+                font-weight: bold;
+                display: flex;
+                justify-content: center;
+            }
+
+            .btn-facebook .fa {
+                margin-right: 5px;
+            }
+
             .btn-secondary {
                 background: #0072bc;
                 color: white;
@@ -177,6 +190,10 @@
                             </button>
                             <a href="/register" class="btn btn-secondary">
                                 注册新帐号
+                            </a>
+                            <a href="/login/facebook" class="btn btn-facebook">
+                                <i class="fa fa-lg fa-facebook-official"></i> 
+                                Login with Facebook
                             </a>
                         </div>
                     </div>

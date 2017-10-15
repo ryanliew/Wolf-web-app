@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\AuthenticateUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
@@ -38,14 +40,17 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function redirectToProvider()
+    public function redirectToProvider(AuthenticateUser $authenticateUser, Request $request)
     {
+        return $authenticateUser->execute($request->has('code'));
+
         return Socialite::driver('facebook')->redirect();
     }
 
     public function handleProviderCallback()
     {
         $user = Socialite::driver('facebook')->user();
+
         dd($user);
     }
 }
