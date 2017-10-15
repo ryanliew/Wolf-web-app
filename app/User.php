@@ -58,6 +58,9 @@ class User extends Authenticatable
 
     public function getAvatarPathAttribute($avatar)
     {
+        if(strpos($avatar, 'facebook') !== false )
+            return $avatar;
+           
         return asset( $avatar ? 'storage/' . $avatar : "/img/default.jpg");
     }
 
