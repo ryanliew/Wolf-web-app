@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class AuthenticateUser {
