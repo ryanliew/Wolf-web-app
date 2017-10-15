@@ -15,7 +15,8 @@ class UserRepository {
 			]
 		);
 
-		$user->update(['avatar_path' => $userData->avatar, 'name' => $userData->name]);
+		if(!($user->is_user_avatar || $user->is_user_name))
+			$user->update(['avatar_path' => $userData->avatar_original, 'name' => $userData->name]);
 
 		return $user;
 	}
