@@ -15,7 +15,7 @@ class UserController extends Controller
 
    	public function store(Request $request)
    	{
-   		auth()->user()->update(['name' => $request->name, 'is_user_name' => true]);
+   		auth()->user()->update(['name' => $request->name]);
 
    		return response(200);
    	}
