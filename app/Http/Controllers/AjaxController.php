@@ -103,8 +103,7 @@ class AjaxController extends Controller
         ]);
 
         $user->update([
-            'avatar_path' => request()->file('avatar')->store('avatars', 'public'),
-            'is_user_avatar' => true
+            'avatar_path' => request()->file('avatar')->store('avatars', 'public')
         ]);
 
         return response([], 204);
