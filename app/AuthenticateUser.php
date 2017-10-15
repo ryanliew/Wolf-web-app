@@ -25,7 +25,7 @@ class AuthenticateUser {
 
 	public function getAuthorizationFirst()
 	{
-		Socialite::driver('facebook')->redirect();
+		return Socialite::driver('facebook')->redirect();
 	}
 
 }
