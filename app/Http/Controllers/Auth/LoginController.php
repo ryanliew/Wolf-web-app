@@ -44,4 +44,9 @@ class LoginController extends Controller
     {
         return $authenticateUser->execute($request->has('code'), $this);
     }
+
+    public function userHasLoggedIn($user)
+    {
+        return redirect('/home');
+    }
 }
