@@ -9,24 +9,23 @@ class AuthenticateUser {
 
 	private $users, $socialite;
 
-	function __construct(UserRepository $users, Socialite $socialite)
+	function __construct(UserRepository $users)
 	{
 		$this->users = $users;
-		$this->socialite = $socialite;
 	}
 
 	public function execute($hasCode)
 	{
 		if( ! $hasCode) return $this->getAuthorizationFirst();
 
-		$user = $this->socialite->driver('facebook')->user();
+		$user = Socialite::driver('facebook')->user();
 
 		dd($user);
 	}
 
 	public function getAuthorizationFirst()
 	{
-		$this->socialite->driver('facebook')->redirect();
+		Socialite::driver('facebook')->redirect();
 	}
 
 }
