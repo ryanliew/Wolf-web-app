@@ -9,7 +9,7 @@ class AuthenticateUser {
 
 	private $users, $socialite;
 
-	function __construct(UserRepository $users, Socialite $socialite, Authenticator $auth)
+	function __construct(UserRepository $users, Socialite $socialite)
 	{
 		$this->users = $users;
 		$this->socialite = $socialite;
