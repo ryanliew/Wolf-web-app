@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\AuthenticateUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
@@ -35,5 +38,15 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function loginWithFacebook(AuthenticateUser $authenticateUser, Request $request)
+    {
+        return $authenticateUser->execute($request->has('code'), $this);
+    }
+
+    public function userHasLoggedIn($user)
+    {
+        return redirect('/home');
     }
 }

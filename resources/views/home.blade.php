@@ -23,7 +23,7 @@
                         </thead>
                         <tbody class="text-center">
                             @foreach($users->sortByDesc('score')->values() as $key => $player)
-                                <tr>
+                                <tr @if($player->id == auth()->id()) class="is-user" @endif>
                                     <td>{{ $key + 1 }}</td>
                                     <td class="text-left">
                                         <a href="{{ route('profile', $player->id) }}">

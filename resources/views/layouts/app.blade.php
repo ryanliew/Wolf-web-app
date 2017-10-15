@@ -306,6 +306,10 @@
             padding: 10px 0;
         }
 
+        tr.is-user {
+            background: rgba(255,82,82,0.7);
+        }
+
     </style>
 </head>
 
