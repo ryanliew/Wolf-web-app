@@ -14,18 +14,25 @@ class AuthenticateUser {
 		$this->users = $users;
 	}
 
-	public function execute($hasCode)
+	public function execute($hasCode, $listener)
 	{
 		if( ! $hasCode) return $this->getAuthorizationFirst();
 
-		$user = Socialite::driver('facebook')->user();
+		$user = $this->users->findByUsernameOrCreate($this->getFacebookUser());
 
-		dd($user);
+		Auth::login($user, true);
+
+		return $listener->userHasLoggedIn($user);
 	}
 
 	public function getAuthorizationFirst()
 	{
 		return Socialite::driver('facebook')->redirect();
+	}
+
+	public function getFacebookUser()
+	{
+		return Socialite::driver('facebook')->user();
 	}
 
 }

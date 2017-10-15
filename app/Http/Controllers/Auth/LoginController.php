@@ -40,17 +40,13 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function redirectToProvider(AuthenticateUser $authenticateUser, Request $request)
+    public function loginWithFacebook(AuthenticateUser $authenticateUser, Request $request)
     {
-        return $authenticateUser->execute($request->has('code'));
-
-        return Socialite::driver('facebook')->redirect();
+        return $authenticateUser->execute($request->has('code'), $this);
     }
 
-    public function handleProviderCallback()
+    public function userHasLoggedIn($user)
     {
-        $user = Socialite::driver('facebook')->user();
-
-        dd($user);
+        return redirect(route('profile', $user));
     }
 }
