@@ -22,5 +22,7 @@ return [
     'nine-tailed-fox'       => '九尾妖狐',
     'white-wolf'            => '白狼王',
     'magician'              => '魔术师',
-    'poison-wolf'           => '毒狼'
+    'poison-wolf'           => '毒狼',
+    'assassin'              => '潜行者',
+    'silence-chief'         => '禁言长老'
 ];
