@@ -354,7 +354,7 @@
                             <li><a href="{{ route('register') }}">注册</a></li>
                         @else
                             <li>
-                                <a href="/patches">公告</a>
+                                <a href="/notice">公告</a>
                             </li>
                             <li>
                                 <a href="/home">排行榜</a>
