@@ -71,7 +71,7 @@
             cursor: pointer;
         }
 
-        .roles-list {
+        .roles-list, .script-dialog {
             position: fixed;
             top: 20vh;
             left: 15vw;
@@ -84,6 +84,14 @@
             box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.75);
             padding: 5vw;
             color: black;
+        }
+
+        .script-dialog ul {
+            padding-left: 0;
+        }
+
+        .script-dialog li {
+            list-style: none;
         }
 
         .roles-list li {
@@ -273,6 +281,10 @@
             margin-left: 5px;
         }
 
+        .ml-10 {
+            margin-left: 10px;
+        }
+
         .background-good {
             background: #2ab27b;
         }
@@ -308,6 +320,10 @@
 
         tr.is-user {
             background: rgba(255,82,82,0.7);
+        }
+
+        .panel-egypt a {
+            color: white;
         }
 
     </style>

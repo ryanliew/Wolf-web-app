@@ -8,6 +8,8 @@ class Role extends Model
 {
 	protected $appends = ['avatar_path'];
 
+	protected $with = ['lines'];
+
 	public function getAvatarPathAttribute()
 	{
 		return '/img/roles/' . $this->slug . '.jpg';		
@@ -16,5 +18,10 @@ class Role extends Model
 	public function games()
     {
         return $this->belongsToMany('App\Game')->withTimestamps();
-    }		
+    }	
+
+    public function lines()
+    {
+    	return $this->hasMany('App\Line');
+    }	
 }

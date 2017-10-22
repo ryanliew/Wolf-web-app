@@ -21,9 +21,14 @@ class AuthenticateUser {
 
 		$user = $this->users->findByUsernameOrCreate($this->getFacebookUser());
 
-		Auth::login($user, true);
+		if($user)
+		{
+			Auth::login($user, true);
 
-		return $listener->userHasLoggedIn($user);
+			return $listener->userHasLoggedIn($user);
+		}
+
+		return $listener->invalidUserInformation();
 	}
 
 	public function getAuthorizationFirst()

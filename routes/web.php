@@ -15,6 +15,10 @@ Route::get('/', function () {
    	return redirect('/login');
 });
 
+Route::get('/test', function() {
+	return view('auth.invalid-facebook');
+});
+
 Auth::routes();
 Route::get('/login/facebook', 'Auth\LoginController@loginWithFacebook');
 
@@ -40,6 +44,7 @@ Route::prefix('ajax')->middleware(['auth'])->group(function() {
 	Route::post('/users/{user}/avatar', 'AjaxController@updateUserAvatar');
 	Route::get('/players', 'AjaxController@getPlayers');
 	Route::post('/players/create', 'AjaxController@createPlayer');
+	Route::get('/previous-players', 'AjaxController@getPreviousPlayers');
 	Route::get('/roles', 'AjaxController@getRoles');
 	Route::get('/game/{game}/player/role', 'AjaxController@getPlayerRoleInGame');
 	Route::get('/game/{game}/judge', 'AjaxController@getJudgeInGame');

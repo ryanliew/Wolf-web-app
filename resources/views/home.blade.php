@@ -34,7 +34,7 @@
                                         </a>
                                     </td>
                                     <td>{{ $player->score }}</td>
-                                    <td>{{ round($player->win_rate, 2) }}%</td>
+                                    <td>{{ round($player->win_rate, 0) }}%</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -59,11 +59,11 @@
                         <tbody>
                             <tr>
                                 <td>好人阵营</td>
-                                <td>{{ $total_score > 0 ? round( $good_score / $total_score * 100, 2 ) : 0 }}%</td>
+                                <td>{{ $total_score > 0 ? round( $good_score / $total_score * 100, 0 ) : 0 }}%</td>
                             </tr>
                             <tr>
                                 <td>狼人阵营</td>
-                                <td>{{ $total_score > 0 ? round( $bad_score / $total_score * 100, 2 ) : 0 }}%</td>
+                                <td>{{ $total_score > 0 ? round( $bad_score / $total_score * 100, 0 ) : 0 }}%</td>
                             </tr>
                         </tbody>
                     </table>
