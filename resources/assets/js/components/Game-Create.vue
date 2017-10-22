@@ -89,7 +89,7 @@
 				create_player: false,
 				new_name: "",
 				roles: [],
-				selected_roles: [],
+				selected_roles: [5,6],
 			};
 		},
 
@@ -104,6 +104,17 @@
 				.then(resp => {
 					this.roles = resp.data;
 				});
+
+			axios.get('/ajax/user/profile')
+				.then(resp => {
+					this.judge = resp.data;
+					axios.get('/ajax/previous-players')
+					.then(resp => {
+						this.players = resp.data
+					});
+				});
+
+			
 		},
 
 		methods: {

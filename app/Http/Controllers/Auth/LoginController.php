@@ -49,4 +49,9 @@ class LoginController extends Controller
     {
         return redirect('/home');
     }
+
+    public function invalidUserInformation()
+    {
+        return view('auth.invalid-facebook');
+    }
 }

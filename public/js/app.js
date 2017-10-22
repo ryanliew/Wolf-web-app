@@ -42654,7 +42654,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			create_player: false,
 			new_name: "",
 			roles: [],
-			selected_roles: []
+			selected_roles: [5, 6]
 		};
 	},
 	created: function created() {
@@ -42667,6 +42667,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 		axios.get('/ajax/roles').then(function (resp) {
 			_this.roles = resp.data;
+		});
+
+		axios.get('/ajax/user/profile').then(function (resp) {
+			_this.judge = resp.data;
+			axios.get('/ajax/previous-players').then(function (resp) {
+				_this.players = resp.data;
+			});
 		});
 	},
 
@@ -43122,6 +43129,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -43135,7 +43156,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			players: false,
 			judge: false,
 			game: false,
-			random: 0
+			random: "-",
+			sequence: "-",
+			lines: false,
+			show_lines: false,
+			current_line: 0
 		};
 	},
 	created: function created() {
@@ -43158,9 +43183,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		setJudge: function setJudge(response) {
 			this.judge = response.data;
 		},
-		setRoles: function setRoles(response) {
-			this.roles = response.data;
-		},
 		win: function win(type) {
 			axios.post('/ajax/game/' + this.id + '/end', {
 				type: type
@@ -43175,19 +43197,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return n.pivot.is_alive;
 			});
 			var key = _.random(0, alivePlayers.length - 1);
-			this.random = alivePlayers[key].name;
+			this.random = key + 1;
+
+			var sequence = ["左", "右"];
+			this.sequence = sequence[_.random(0, sequence.length - 1)];
 		},
 		kill: function kill(index) {
 			this.players[index].pivot.is_alive = 0;
 		},
 		revive: function revive(index) {
 			this.players[index].pivot.is_alive = 1;
+		},
+		showLines: function showLines(index) {
+			this.show_lines = true;
+			this.current_line = index;
+			this.lines = this.orderedRoles[this.current_line].lines;
+		},
+		hideLines: function hideLines() {
+			this.show_lines = false;
+		},
+		nextLine: function nextLine() {
+			this.current_line++;
+			if (this.current_line == this.orderedRoles.length) {
+				this.show_lines = false;
+			} else {
+				this.lines = this.orderedRoles[this.current_line].lines;
+			}
 		}
 	},
 
 	computed: {
 		orderedRoles: function orderedRoles() {
 			return _.orderBy(this.game.roles, 'sequence');
+		},
+		orderedLines: function orderedLines() {
+			return _.orderBy(this.lines, 'sequence');
 		}
 	}
 
@@ -43550,7 +43594,14 @@ var render = function() {
         _vm._l(_vm.orderedRoles, function(role, index) {
           return role.id !== 5
             ? _c("li", { key: role.id }, [
-                _c("img", { attrs: { src: role.avatar_path } })
+                _c("img", {
+                  attrs: { src: role.avatar_path },
+                  on: {
+                    click: function($event) {
+                      _vm.showLines(index)
+                    }
+                  }
+                })
               ])
             : _vm._e()
         })
@@ -43560,18 +43611,28 @@ var render = function() {
         "div",
         { staticClass: "flex flex-center justify-center text-center" },
         [
-          _c("b", [
-            _vm._v("发言玩家: "),
-            _c("span", { domProps: { textContent: _vm._s(_vm.random) } })
+          _c("div", { staticClass: "text-left" }, [
+            _c("b", [
+              _vm._v("发言玩家: "),
+              _c("span", {
+                domProps: { textContent: _vm._s(_vm.random + "号") }
+              })
+            ]),
+            _c("br"),
+            _vm._v(" "),
+            _c("b", [
+              _vm._v("发言顺序: "),
+              _c("span", { domProps: { textContent: _vm._s(_vm.sequence) } })
+            ])
           ]),
           _vm._v(" "),
           _c(
             "button",
             {
-              staticClass: "btn btn-default ml-5",
+              staticClass: "btn btn-default ml-10",
               on: { click: _vm.randomSelect }
             },
-            [_vm._v("重选")]
+            [_vm._v("随机重选")]
           )
         ]
       )
@@ -43629,6 +43690,42 @@ var render = function() {
               }
             },
             [_vm._v("狼人获胜")]
+          )
+        ])
+      : _vm._e(),
+    _vm._v(" "),
+    _vm.show_lines
+      ? _c("div", { staticClass: "script-dialog text-center" }, [
+          _c(
+            "ul",
+            _vm._l(_vm.orderedLines, function(line, index) {
+              return _c("li", { key: line.id }, [
+                _c("span", {
+                  domProps: { textContent: _vm._s(line.description) }
+                })
+              ])
+            })
+          ),
+          _vm._v(" "),
+          _c("hr"),
+          _vm._v(" "),
+          _c(
+            "button",
+            { staticClass: "btn btn-success", on: { click: _vm.nextLine } },
+            [_vm._v("下一个")]
+          ),
+          _vm._v(" "),
+          _c(
+            "button",
+            {
+              staticClass: "btn btn-primary",
+              on: {
+                click: function($event) {
+                  _vm.show_lines = false
+                }
+              }
+            },
+            [_vm._v("返回")]
           )
         ])
       : _vm._e()
