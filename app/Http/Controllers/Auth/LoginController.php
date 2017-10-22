@@ -28,7 +28,7 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/notice';
 
     /**
      * Create a new controller instance.
@@ -47,7 +47,7 @@ class LoginController extends Controller
 
     public function userHasLoggedIn($user)
     {
-        return redirect('/home');
+        return redirect('/notice');
     }
 
     public function invalidUserInformation()

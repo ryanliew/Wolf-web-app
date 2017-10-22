@@ -15,14 +15,13 @@ Route::get('/', function () {
    	return redirect('/login');
 });
 
-Route::get('/test', function() {
-	return view('auth.invalid-facebook');
-});
+
 
 Auth::routes();
 Route::get('/login/facebook', 'Auth\LoginController@loginWithFacebook');
 
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/notice', 'HomeController@patches');
 Route::get('/profile/{user}', 'UserController@update')->name('profile');
 
 Route::prefix('games')->middleware(['auth'])->group(function() {
