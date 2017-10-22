@@ -6,13 +6,16 @@
 			
 			<ul class="list-inline instructions">
 				<li v-for="(role, index) in orderedRoles" :key="role.id" v-if="role.id !== 5">
-					<img :src="role.avatar_path">
+					<img :src="role.avatar_path" @click="showLines(index)">
 				</li>
 			</ul>
 
 			<div class="flex flex-center justify-center text-center">
-				<b>发言玩家: <span v-text="random"></span></b>
-				<button class="btn btn-default ml-5" @click="randomSelect">重选</button>
+				<div>
+					<b>发言玩家: <span v-text="random + '号'"></span></b><br>
+					<b>发言顺序: <span v-text="sequence"></span></b>
+				</div>
+				<button class="btn btn-default ml-10" @click="randomSelect">随机重选</button>
 			</div>
 
 		</div>
@@ -24,6 +27,17 @@
 		<div class="row text-center" v-if="!game.is_concluded">
 			<button class="btn btn-success" @click="win('good')">好人获胜</button>
 			<button class="btn btn-danger"@click="win('bad')">狼人获胜</button>
+		</div>
+
+		<div v-if="show_lines" class="script-dialog text-center">
+			<ul>
+				<li v-for="(line, index) in orderedLines" :key="line.id">
+					<span v-text="line.description"></span>
+				</li>
+			</ul>
+			<hr>
+			<button class="btn btn-success" @click="nextLine">下一个</button>
+			<button class="btn btn-primary" @click="show_lines = false">返回</button>	
 		</div>
 	</div>
 </template>
@@ -41,20 +55,23 @@
 				players: false,
 				judge: false,
 				game: false,
-				random: 0
+				random: "-",
+				sequence: "-",
+				lines: false,
+				show_lines: false,
+				current_line: 0,
 			};
 		},
 
 		created() {
 			this.fetch();
+
 		},
 
 		methods: {
 			fetch() {
 				axios.get('/ajax/game/' + this.id)
-					.then(this.setGame);
-				
-				
+					.then(this.setGame);	
 			},
 
 			refresh(response) {
@@ -71,10 +88,6 @@
 
 			setJudge(response) {
 				this.judge = response.data;
-			},
-
-			setRoles(response) {
-				this.roles = response.data;
 			},
 
 			win(type) {
@@ -96,7 +109,10 @@
 					return n.pivot.is_alive;
 				});
 				var key = _.random(0, alivePlayers.length - 1);
-				this.random = alivePlayers[key].name;
+				this.random = key + 1;
+
+				var sequence = ["左", "右"];
+				this.sequence = sequence[_.random(0, sequence.length - 1)];
 			},
 
 			kill(index) {
@@ -105,12 +121,40 @@
 
 			revive(index) {
 				this.players[index].pivot.is_alive = 1;
+			},
+
+			showLines(index) {
+				this.show_lines = true;
+				this.current_line = index;
+				this.lines = this.orderedRoles[this.current_line].lines;
+			},
+
+			hideLines() {
+				this.show_lines = false
+			},
+
+			nextLine() {
+				this.current_line++;
+				if(this.current_line == this.orderedRoles.length)
+				{
+					this.show_lines = false;
+				}
+				else
+				{
+					this.lines = this.orderedRoles[this.current_line].lines;
+				}
 			}
+
+
 		},
 
 		computed: {
 			orderedRoles() {
 				return _.orderBy(this.game.roles, 'sequence');
+			},
+
+			orderedLines() {
+				return _.orderBy(this.lines, 'sequence');
 			},
 		}	
 

@@ -61,6 +61,11 @@ class AjaxController extends Controller
         return $game->toJson();
     }
 
+    public function getPreviousPlayers()
+    {
+        return Game::latest()->first()->players()->toJson();
+    }
+
     public function setRoleInGame(Request $request, Game $game)
     {
         $game->users()->updateExistingPivot($request->user_id, ["role_id" => $request->role_id]);

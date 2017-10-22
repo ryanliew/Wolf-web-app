@@ -88,6 +88,6 @@ class User extends Authenticatable
 
     public function getShortNameAttribute()
     {
-        return substr( $this->name, 0, 10 );
+        return substr( $this->name, 0, 7 );
     }
 }
