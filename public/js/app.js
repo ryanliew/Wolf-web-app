@@ -43611,7 +43611,7 @@ var render = function() {
         "div",
         { staticClass: "flex flex-center justify-center text-center" },
         [
-          _c("div", [
+          _c("div", { staticClass: "text-left" }, [
             _c("b", [
               _vm._v("发言玩家: "),
               _c("span", {

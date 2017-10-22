@@ -11,7 +11,7 @@
 			</ul>
 
 			<div class="flex flex-center justify-center text-center">
-				<div>
+				<div class="text-left">
 					<b>发言玩家: <span v-text="random + '号'"></span></b><br>
 					<b>发言顺序: <span v-text="sequence"></span></b>
 				</div>
