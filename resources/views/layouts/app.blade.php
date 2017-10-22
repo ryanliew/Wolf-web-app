@@ -396,6 +396,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js?v=1.5') }}"></script>
+    <script src="{{ asset('js/app.js?v=1.6') }}"></script>
 </body>
 </html>
