@@ -21,7 +21,7 @@ class AjaxController extends Controller
 
     public function getPlayers(Request $request)
     {
-    	return User::where('id', '<>', $request->not)->get()->toJson();
+    	return User::where('id', '<>', $request->not)->orderBy('name')->get()->toJson();
     }
 
     public function createPlayer(Request $request)

@@ -10,19 +10,14 @@
 			placeholder="请选择上帝..."
 			label="name">		
 		</v-select>
-
+		<br>
 		<label>玩家:</label>
-		<v-select 
-			:debounce="500"
-			:on-search="getPlayers"
-			:options="potential_players"
-			v-model="players"
-			placeholder="请选择玩家..."
-			label="name"
-			multiple>		
-		</v-select>
+		<button class="btn btn-primary" @click="isSelecting=true">选择玩家</button>
+		
+		<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-show="isSelecting" :players="potential_players" :initialPlayers="this.previous_players"></players-select>
+		<br>
 
-		<label>总人数: </label> <span v-text="playerNumber"></span>
+		<label>总人数: </label> <span v-text="this.players.length"></span>
 		<br>
 		<div class="row">
 			<div class="col-xs-12">
@@ -74,22 +69,24 @@
 
 <script>
 	import vSelect from "vue-select";
-	
+	import PlayersSelect from "./Players-Select.vue";
 	export default {
 		props: [''],
 		
-		components: {vSelect},
+		components: {vSelect, PlayersSelect},
 		
 		data() {
 			return {
 				judge: false,
-				players: false,
+				players: [],
 				potential_players: [],
 				potential_judge: [],
+				previous_players: [],
 				create_player: false,
 				new_name: "",
 				roles: [],
 				selected_roles: [5,6],
+				isSelecting: false
 			};
 		},
 
@@ -97,7 +94,7 @@
 			axios.get('/ajax/users')
 				.then(resp => {
 					this.potential_judge = resp.data;
-					this.players = false;
+					this.players = [];
 			});
 
 			axios.get('/ajax/roles')
@@ -110,7 +107,9 @@
 					this.judge = resp.data;
 					axios.get('/ajax/previous-players')
 					.then(resp => {
-						this.players = resp.data
+						//Vue.set(this.previous_players, resp.data);
+						this.previous_players = resp.data;
+						this.players = resp.data.map(a => a.id);
 					});
 				});
 
@@ -126,14 +125,14 @@
 						}
 					}).then(resp => {
 						this.potential_judge = resp.data;
-						this.players = false;
+						this.players = [];
 						loading(false)
 					});
 			},
 
 			refreshPlayers(judge){
 				this.judge = judge;
-				this.players = false;
+				this.players = [];
 				axios.get('/ajax/players', {
 					params: {
 						not: this.judge.id 
@@ -157,15 +156,10 @@
 			},
 
 			createGame(){
-				var players_id = [];
-				this.players.forEach(function(element){
-					players_id[players_id.length] = element.id;
-				});
-
 				axios.post('/games/create', {
 
 					judge: this.judge.id,
-					players: players_id,
+					players: this.players,
 					roles: this.selected_roles
 
 				}).then(resp => {
@@ -182,20 +176,18 @@
 					this.new_name = "";
 					this.getJudge();
 				});
+			},
+
+			toggled(data) {
+				if(data[0] && !this.players.includes(data[1]))
+					this.players.push(data[1]);
+				else if(!data[0] && this.players.includes(data[1]))
+					_.remove(this.players, function(id){
+						return id == data[1];
+					});
 			}
 
 
-		},
-
-		computed: {
-			playerNumber() {
-				var number = 0;
-
-				if(this.players)
-					return this.players.length;
-
-				return number;
-			}
 		}
 
 	}

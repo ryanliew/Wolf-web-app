@@ -21,7 +21,7 @@
 		</div>
 		<div>
 			<ul class="list-inline player-list">
-		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
+		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :selectedRole="selectedRole[player.id]" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
 			</ul>
 		</div>
 		<div class="row text-center" v-if="!game.is_concluded">
@@ -30,11 +30,17 @@
 		</div>
 
 		<div v-if="show_lines" class="script-dialog text-center">
+			<img :src="this.orderedRoles[this.current_line].avatar_path"/>
 			<ul>
 				<li v-for="(line, index) in orderedLines" :key="line.id">
 					<span v-text="line.description"></span>
 				</li>
 			</ul>
+			
+			<button class="btn btn-danger btn-small" @click="isSelecting=true">设定玩家身份</button>
+
+			<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-if="isSelecting" :players="players" :initialPlayers="initialSelectedRole"></players-select>
+
 			<hr>
 			<button class="btn btn-success" @click="nextLine">下一个</button>
 			<button class="btn btn-primary" @click="show_lines = false">返回</button>	
@@ -44,9 +50,10 @@
 
 <script>
 	import PlayerDetails from './Player-Details.vue';
+	import PlayersSelect from './Players-Select.vue';
 
 	export default {
-		components: { PlayerDetails },
+		components: { PlayerDetails, PlayersSelect },
 
 		props: ['id'],
 
@@ -60,6 +67,9 @@
 				lines: false,
 				show_lines: false,
 				current_line: 0,
+				isSelecting: false,
+				selectedRole: [],
+				initialSelectedRole: []
 			};
 		},
 
@@ -127,6 +137,7 @@
 				this.show_lines = true;
 				this.current_line = index;
 				this.lines = this.orderedRoles[this.current_line].lines;
+				this.initialSelectedRole = _.filter(this.players, function(o){ return o.pivot.role_id == this.currentRole.id; }.bind(this));
 			},
 
 			hideLines() {
@@ -143,6 +154,23 @@
 				{
 					this.lines = this.orderedRoles[this.current_line].lines;
 				}
+
+				this.initialSelectedRole = _.filter(this.players, function(o){ return o.pivot.role_id == this.currentRole.id; }.bind(this));
+			},
+
+			toggled(data) {
+				this.selectedRole[data[1]] = false;
+				if(data[0])
+				{
+					this.selectedRole[data[1]] = this.currentRole;
+				}
+
+				_.find(this.players, ['id', data[1]]).pivot.role_id = data[0] ? this.currentRole.id : 10;
+
+				axios.post('/ajax/game/' + this.game.id + '/role', {
+                    user_id: data[1],
+                    role_id: this.currentRole.id
+                });
 			}
 
 
@@ -156,6 +184,10 @@
 			orderedLines() {
 				return _.orderBy(this.lines, 'sequence');
 			},
+
+			currentRole() {
+				return this.orderedRoles[this.current_line];
+			}
 		}	
 
 
