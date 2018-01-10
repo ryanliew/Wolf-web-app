@@ -870,7 +870,7 @@ module.exports = Cancel;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(10);
-module.exports = __webpack_require__(58);
+module.exports = __webpack_require__(64);
 
 
 /***/ }),
@@ -903,8 +903,8 @@ window.flash = function (message) {
 
 Vue.component('flash', __webpack_require__(37));
 Vue.component('game-create', __webpack_require__(45));
-Vue.component('game-details', __webpack_require__(49));
-Vue.component('user-profile', __webpack_require__(55));
+Vue.component('game-details', __webpack_require__(55));
+Vue.component('user-profile', __webpack_require__(61));
 Vue.component('v-select', 'vue-select');
 
 var app = new Vue({
@@ -42518,7 +42518,7 @@ var normalizeComponent = __webpack_require__(1)
 /* script */
 var __vue_script__ = __webpack_require__(46)
 /* template */
-var __vue_template__ = __webpack_require__(48)
+var __vue_template__ = __webpack_require__(54)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -42563,11 +42563,8 @@ module.exports = Component.exports
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_select__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_select___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue_select__);
-//
-//
-//
-//
-//
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__);
 //
 //
 //
@@ -42643,18 +42640,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = ({
 	props: [''],
 
-	components: { vSelect: __WEBPACK_IMPORTED_MODULE_0_vue_select___default.a },
+	components: { vSelect: __WEBPACK_IMPORTED_MODULE_0_vue_select___default.a, PlayersSelect: __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default.a },
 
 	data: function data() {
 		return {
 			judge: false,
-			players: false,
+			players: [],
 			potential_players: [],
 			potential_judge: [],
+			previous_players: [],
 			create_player: false,
 			new_name: "",
 			roles: [],
-			selected_roles: [5, 6]
+			selected_roles: [5, 6],
+			isSelecting: false
 		};
 	},
 	created: function created() {
@@ -42662,7 +42661,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 		axios.get('/ajax/users').then(function (resp) {
 			_this.potential_judge = resp.data;
-			_this.players = false;
+			_this.players = [];
 		});
 
 		axios.get('/ajax/roles').then(function (resp) {
@@ -42672,7 +42671,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		axios.get('/ajax/user/profile').then(function (resp) {
 			_this.judge = resp.data;
 			axios.get('/ajax/previous-players').then(function (resp) {
-				_this.players = resp.data;
+				//Vue.set(this.previous_players, resp.data);
+				_this.previous_players = resp.data;
+				_this.players = resp.data.map(function (a) {
+					return a.id;
+				});
 			});
 		});
 	},
@@ -42689,7 +42692,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				}
 			}).then(function (resp) {
 				_this2.potential_judge = resp.data;
-				_this2.players = false;
+				_this2.players = [];
 				loading(false);
 			});
 		},
@@ -42697,7 +42700,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var _this3 = this;
 
 			this.judge = judge;
-			this.players = false;
+			this.players = [];
 			axios.get('/ajax/players', {
 				params: {
 					not: this.judge.id
@@ -42720,15 +42723,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			});
 		},
 		createGame: function createGame() {
-			var players_id = [];
-			this.players.forEach(function (element) {
-				players_id[players_id.length] = element.id;
-			});
-
 			axios.post('/games/create', {
 
 				judge: this.judge.id,
-				players: players_id,
+				players: this.players,
 				roles: this.selected_roles
 
 			}).then(function (resp) {
@@ -42746,16 +42744,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				_this5.new_name = "";
 				_this5.getJudge();
 			});
-		}
-	},
-
-	computed: {
-		playerNumber: function playerNumber() {
-			var number = 0;
-
-			if (this.players) return this.players.length;
-
-			return number;
+		},
+		toggled: function toggled(data) {
+			if (data[0] && !this.players.includes(data[1])) this.players.push(data[1]);else if (!data[0] && this.players.includes(data[1])) _.remove(this.players, function (id) {
+				return id == data[1];
+			});
 		}
 	}
 
@@ -42771,6 +42764,288 @@ r(t=e)}else o()}}function l(t,e,n,r){var o=n?"":r.css;if(t.styleSheet)t.styleShe
 
 /***/ }),
 /* 48 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(49)
+/* template */
+var __vue_template__ = __webpack_require__(53)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Players-Select.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Players-Select.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-1fe0f8f8", Component.options)
+  } else {
+    hotAPI.reload("data-v-1fe0f8f8", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 49 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Select_vue__ = __webpack_require__(50);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Select_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Player_Select_vue__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: ['players', 'initialPlayers'],
+
+	components: { PlayerSelect: __WEBPACK_IMPORTED_MODULE_0__Player_Select_vue___default.a },
+
+	data: function data() {
+		return {};
+	},
+
+
+	methods: {
+		isSelectedInitially: function isSelectedInitially(player) {
+			return _.find(this.initialPlayers, ['id', player]) ? true : false;
+		},
+		close: function close() {
+			this.$emit('closed');
+		},
+		selectionChanged: function selectionChanged(data) {
+			this.$emit('selectionChanged', data);
+		}
+	}
+});
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(51)
+/* template */
+var __vue_template__ = __webpack_require__(52)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Player-Select.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Player-Select.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-5fd4d292", Component.options)
+  } else {
+    hotAPI.reload("data-v-5fd4d292", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 51 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: ['player', 'initialSelection'],
+	data: function data() {
+		return {
+			selected: this.initialSelection
+		};
+	},
+
+
+	methods: {
+		toggled: function toggled() {
+			this.selected = !this.selected;
+			this.$emit('selectionChanged', [this.selected, this.player.id]);
+		}
+	},
+
+	computed: {
+		actuallySelected: function actuallySelected() {
+			return this.initialSelection || this.selected;
+		}
+	}
+});
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("li", [
+    _c("div", { staticClass: "flex flex-center" }, [
+      _c(
+        "label",
+        {
+          staticClass: "flex flex-center level",
+          attrs: { for: "select" + _vm.player.id }
+        },
+        [
+          _c("div", {
+            staticClass: "img-circle profile img-small",
+            style: "background-image: url(" + _vm.player.avatar_path + ");"
+          }),
+          _vm._v(" "),
+          _c("span", {
+            staticClass: "level",
+            domProps: { textContent: _vm._s(_vm.player.name) }
+          })
+        ]
+      ),
+      _vm._v(" "),
+      _c("input", {
+        attrs: { type: "checkbox", id: "select" + _vm.player.id },
+        domProps: { checked: _vm.actuallySelected },
+        on: { click: _vm.toggled }
+      })
+    ])
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-5fd4d292", module.exports)
+  }
+}
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "popup-selector" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "list-parent" }, [
+      _c(
+        "ul",
+        { staticClass: "list-unstyled" },
+        _vm._l(_vm.players, function(player, index) {
+          return _c("player-select", {
+            key: player.id,
+            attrs: {
+              player: player,
+              initialSelection: _vm.isSelectedInitially(player.id)
+            },
+            on: { selectionChanged: _vm.selectionChanged }
+          })
+        })
+      )
+    ]),
+    _vm._v(" "),
+    _c(
+      "button",
+      { staticClass: "btn btn-primary btn-full", on: { click: _vm.close } },
+      [_vm._v("确定")]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "text-center" }, [
+      _c("h4", [_vm._v("选择玩家")])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-1fe0f8f8", module.exports)
+  }
+}
+
+/***/ }),
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -42801,29 +43076,49 @@ var render = function() {
         }
       }),
       _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
       _c("label", [_vm._v("玩家:")]),
       _vm._v(" "),
-      _c("v-select", {
-        attrs: {
-          debounce: 500,
-          "on-search": _vm.getPlayers,
-          options: _vm.potential_players,
-          placeholder: "请选择玩家...",
-          label: "name",
-          multiple: ""
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          on: {
+            click: function($event) {
+              _vm.isSelecting = true
+            }
+          }
         },
-        model: {
-          value: _vm.players,
-          callback: function($$v) {
-            _vm.players = $$v
-          },
-          expression: "players"
+        [_vm._v("选择玩家")]
+      ),
+      _vm._v(" "),
+      _c("players-select", {
+        directives: [
+          {
+            name: "show",
+            rawName: "v-show",
+            value: _vm.isSelecting,
+            expression: "isSelecting"
+          }
+        ],
+        attrs: {
+          players: _vm.potential_players,
+          initialPlayers: this.previous_players
+        },
+        on: {
+          selectionChanged: _vm.toggled,
+          closed: function($event) {
+            _vm.isSelecting = false
+          }
         }
       }),
       _vm._v(" "),
+      _c("br"),
+      _vm._v(" "),
       _c("label", [_vm._v("总人数: ")]),
       _vm._v(" "),
-      _c("span", { domProps: { textContent: _vm._s(_vm.playerNumber) } }),
+      _c("span", { domProps: { textContent: _vm._s(this.players.length) } }),
       _vm._v(" "),
       _c("br"),
       _vm._v(" "),
@@ -43046,15 +43341,15 @@ if (false) {
 }
 
 /***/ }),
-/* 49 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(50)
+var __vue_script__ = __webpack_require__(56)
 /* template */
-var __vue_template__ = __webpack_require__(54)
+var __vue_template__ = __webpack_require__(60)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -43092,13 +43387,15 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 50 */
+/* 56 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue__ = __webpack_require__(51);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Player_Details_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__);
 //
 //
 //
@@ -43143,11 +43440,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-	components: { PlayerDetails: __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default.a },
+	components: { PlayerDetails: __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default.a, PlayersSelect: __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default.a },
 
 	props: ['id'],
 
@@ -43160,7 +43464,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			sequence: "-",
 			lines: false,
 			show_lines: false,
-			current_line: 0
+			current_line: 0,
+			isSelecting: false,
+			selectedRole: [],
+			initialSelectedRole: []
 		};
 	},
 	created: function created() {
@@ -43212,6 +43519,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			this.show_lines = true;
 			this.current_line = index;
 			this.lines = this.orderedRoles[this.current_line].lines;
+			this.initialSelectedRole = _.filter(this.players, function (o) {
+				return o.pivot.role_id == this.currentRole.id;
+			}.bind(this));
 		},
 		hideLines: function hideLines() {
 			this.show_lines = false;
@@ -43223,6 +43533,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			} else {
 				this.lines = this.orderedRoles[this.current_line].lines;
 			}
+
+			this.initialSelectedRole = _.filter(this.players, function (o) {
+				return o.pivot.role_id == this.currentRole.id;
+			}.bind(this));
+		},
+		toggled: function toggled(data) {
+			this.selectedRole[data[1]] = false;
+			if (data[0]) {
+				this.selectedRole[data[1]] = this.currentRole;
+			}
+
+			_.find(this.players, ['id', data[1]]).pivot.role_id = data[0] ? this.currentRole.id : 10;
+
+			axios.post('/ajax/game/' + this.game.id + '/role', {
+				user_id: data[1],
+				role_id: this.currentRole.id
+			});
 		}
 	},
 
@@ -43232,21 +43559,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		orderedLines: function orderedLines() {
 			return _.orderBy(this.lines, 'sequence');
+		},
+		currentRole: function currentRole() {
+			return this.orderedRoles[this.current_line];
 		}
 	}
 
 });
 
 /***/ }),
-/* 51 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(52)
+var __vue_script__ = __webpack_require__(58)
 /* template */
-var __vue_template__ = __webpack_require__(53)
+var __vue_template__ = __webpack_require__(59)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -43284,7 +43614,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 52 */
+/* 58 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43338,14 +43668,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['player', 'rolesSelection', 'gameId', 'is_concluded'],
+    props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole'],
     data: function data() {
         return {
-            role: false,
+            initialRole: false,
             alive: this.player.pivot.is_alive,
             status: "Alive",
             selecting_role: false,
-            avatar: this.player.avatar_path
+            avatar: this.player.avatar_path,
+            role_override: false
         };
     },
 
@@ -43370,12 +43701,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.$emit('revived', this.player.id);
         },
         select: function select(role) {
-            this.role = role;
+            this.initialRole = role;
             axios.post('/ajax/game/' + this.gameId + '/role', {
                 user_id: this.player.id,
                 role_id: this.role.id
             });
             this.selecting_role = false;
+            this.role_override = true;
         },
         getRole: function getRole() {
             var _this = this;
@@ -43385,7 +43717,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     user_id: this.player.id
                 }
             }).then(function (resp) {
-                return _this.role = resp.data;
+                return _this.initialRole = resp.data;
             });
         }
     },
@@ -43398,13 +43730,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         classes: function classes() {
             return [this.alive ? "alive" : "dead"];
+        },
+        role: function role() {
+            return this.selectedRole && !this.role_override ? this.selectedRole : this.initialRole;
         }
     }
 
 });
 
 /***/ }),
-/* 53 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -43572,7 +43907,7 @@ if (false) {
 }
 
 /***/ }),
-/* 54 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -43649,6 +43984,7 @@ var render = function() {
               player: player,
               rolesSelection: _vm.game.roles,
               gameId: _vm.id,
+              selectedRole: _vm.selectedRole[player.id],
               is_concluded: _vm.game.is_concluded
             },
             on: {
@@ -43695,39 +44031,76 @@ var render = function() {
       : _vm._e(),
     _vm._v(" "),
     _vm.show_lines
-      ? _c("div", { staticClass: "script-dialog text-center" }, [
-          _c(
-            "ul",
-            _vm._l(_vm.orderedLines, function(line, index) {
-              return _c("li", { key: line.id }, [
-                _c("span", {
-                  domProps: { textContent: _vm._s(line.description) }
-                })
-              ])
-            })
-          ),
-          _vm._v(" "),
-          _c("hr"),
-          _vm._v(" "),
-          _c(
-            "button",
-            { staticClass: "btn btn-success", on: { click: _vm.nextLine } },
-            [_vm._v("下一个")]
-          ),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-primary",
-              on: {
-                click: function($event) {
-                  _vm.show_lines = false
+      ? _c(
+          "div",
+          { staticClass: "script-dialog text-center" },
+          [
+            _c("img", {
+              attrs: { src: this.orderedRoles[this.current_line].avatar_path }
+            }),
+            _vm._v(" "),
+            _c(
+              "ul",
+              _vm._l(_vm.orderedLines, function(line, index) {
+                return _c("li", { key: line.id }, [
+                  _c("span", {
+                    domProps: { textContent: _vm._s(line.description) }
+                  })
+                ])
+              })
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-danger btn-small",
+                on: {
+                  click: function($event) {
+                    _vm.isSelecting = true
+                  }
                 }
-              }
-            },
-            [_vm._v("返回")]
-          )
-        ])
+              },
+              [_vm._v("设定玩家身份")]
+            ),
+            _vm._v(" "),
+            _vm.isSelecting
+              ? _c("players-select", {
+                  attrs: {
+                    players: _vm.players,
+                    initialPlayers: _vm.initialSelectedRole
+                  },
+                  on: {
+                    selectionChanged: _vm.toggled,
+                    closed: function($event) {
+                      _vm.isSelecting = false
+                    }
+                  }
+                })
+              : _vm._e(),
+            _vm._v(" "),
+            _c("hr"),
+            _vm._v(" "),
+            _c(
+              "button",
+              { staticClass: "btn btn-success", on: { click: _vm.nextLine } },
+              [_vm._v("下一个")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary",
+                on: {
+                  click: function($event) {
+                    _vm.show_lines = false
+                  }
+                }
+              },
+              [_vm._v("返回")]
+            )
+          ],
+          1
+        )
       : _vm._e()
   ])
 }
@@ -43749,15 +44122,15 @@ if (false) {
 }
 
 /***/ }),
-/* 55 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(56)
+var __vue_script__ = __webpack_require__(62)
 /* template */
-var __vue_template__ = __webpack_require__(57)
+var __vue_template__ = __webpack_require__(63)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -43795,7 +44168,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 56 */
+/* 62 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -43876,7 +44249,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 57 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -43959,7 +44332,7 @@ if (false) {
 }
 
 /***/ }),
-/* 58 */
+/* 64 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

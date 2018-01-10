@@ -47,14 +47,15 @@
 
 <script>
 	export default {
-		props: ['player', 'rolesSelection', 'gameId', 'is_concluded'],
+		props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole'],
 		data() {
 			return {
-				role: false,
+				initialRole: false,
                 alive: this.player.pivot.is_alive,
                 status: "Alive",
                 selecting_role: false,
-                avatar: this.player.avatar_path
+                avatar: this.player.avatar_path,
+                role_override: false
 			};
 		},
 
@@ -81,12 +82,13 @@
             },
 
             select(role) {
-                this.role = role;
+                this.initialRole = role;
                 axios.post('/ajax/game/' + this.gameId + '/role', {
                     user_id: this.player.id,
                     role_id: this.role.id
                 });
                 this.selecting_role = false;
+                this.role_override = true;
             },
 
             getRole() {
@@ -94,7 +96,7 @@
                     params: {
                         user_id: this.player.id
                     }
-                }).then((resp) => this.role = resp.data);
+                }).then((resp) => this.initialRole = resp.data);
             },
         },
 
@@ -105,6 +107,10 @@
         computed: {
             classes() {
                 return [this.alive ? "alive" : "dead"];
+            },
+
+            role() {
+                return this.selectedRole && !this.role_override ? this.selectedRole : this.initialRole;
             }
         }
 
