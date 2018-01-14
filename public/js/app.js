@@ -44656,7 +44656,7 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _vm.loadingComplete
-                  ? _c("p", { staticClass: "mt-20 text-center" }, [
+                  ? _c("p", { staticClass: "scroll-up text-center" }, [
                       _c("i", { staticClass: "fa fa-angle-double-up fa-2x" }),
                       _c("br"),
                       _vm._v("请向上滑")
