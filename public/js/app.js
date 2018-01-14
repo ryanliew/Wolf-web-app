@@ -916,7 +916,7 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(11);
-module.exports = __webpack_require__(64);
+module.exports = __webpack_require__(67);
 
 
 /***/ }),
@@ -951,7 +951,7 @@ Vue.component('flash', __webpack_require__(38));
 Vue.component('game-create', __webpack_require__(46));
 Vue.component('game-details', __webpack_require__(55));
 Vue.component('user-profile', __webpack_require__(61));
-Vue.component('player-roles', __webpack_require__(78));
+Vue.component('player-roles', __webpack_require__(64));
 Vue.component('v-select', 'vue-select');
 
 var app = new Vue({
@@ -44412,33 +44412,14 @@ if (false) {
 
 /***/ }),
 /* 64 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(1)
 /* script */
-var __vue_script__ = __webpack_require__(79)
+var __vue_script__ = __webpack_require__(65)
 /* template */
-var __vue_template__ = __webpack_require__(80)
+var __vue_template__ = __webpack_require__(66)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -44476,11 +44457,16 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 79 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
 //
 //
 //
@@ -44525,8 +44511,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			judge: false,
 			seat: 0,
 			blocked: true,
-			showText: "亮出身份",
-			orderedPlayers: []
+			showText: "读取身份",
+			orderedPlayers: [],
+			loadingComplete: false
 		};
 	},
 	created: function created() {
@@ -44559,10 +44546,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.currentPlayer = this.judge;
 				this.showText = "开始游戏";
 				this.blocked = true;
+				this.loadingComplete = false;
 			} else {
+				this.showText = "读取身份";
 				this.seat++;
 				this.setPlayer();
 				this.blocked = true;
+				this.loadingComplete = false;
 			}
 		},
 		show: function show() {
@@ -44570,13 +44560,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 			if (this.currentPlayer == this.judge) {
 				window.location.replace('/game/' + this.id);
+			} else if (this.loadingComplete) {
+				this.pass();
 			} else {
+				this.showText = '<i class="fa fa-circle-o-notch fa-spin fa-fw"></i>';
 				axios.get('/ajax/game/' + this.id + '/player/role', {
 					params: {
 						user_id: this.currentPlayer.id
 					}
 				}).then(function (resp) {
-					_this.currentRole = resp.data;_this.blocked = false;
+					_this.currentRole = resp.data;_this.loadingComplete = true;_this.showText = "确认身份";
 				});
 			}
 		}
@@ -44584,7 +44577,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 80 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -44639,10 +44632,9 @@ var render = function() {
       ? _c("div", [
           _vm.blocked
             ? _c("div", { staticClass: "slider text-center" }, [
-                _c("h2", [_vm._v("请把手机交给")]),
+                _c("p", { staticClass: "mb-10" }, [_vm._v("请把手机交给")]),
                 _vm._v(" "),
-                _c("p", {
-                  staticClass: "mb-10",
+                _c("h2", {
                   domProps: { textContent: _vm._s(_vm.currentPlayer.name) }
                 }),
                 _vm._v(" "),
@@ -44654,32 +44646,40 @@ var render = function() {
                     ");"
                 }),
                 _vm._v(" "),
-                _c(
-                  "button",
-                  {
+                _c("div", { staticClass: "confirm-btn text-center" }, [
+                  _c("button", {
                     staticClass: "btn btn-warning",
-                    domProps: { textContent: _vm._s(_vm.showText) },
+                    domProps: { innerHTML: _vm._s(_vm.showText) },
                     on: { click: _vm.show }
-                  },
-                  [_vm._v("亮出身份")]
-                )
+                  })
+                ]),
+                _vm._v(" "),
+                _vm.loadingComplete
+                  ? _c("p", { staticClass: "mt-20 text-center" }, [
+                      _c("i", { staticClass: "fa fa-angle-double-up fa-2x" }),
+                      _c("br"),
+                      _vm._v("请向上滑")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm.loadingComplete
+                  ? _c("div", { staticClass: "slider-show" })
+                  : _vm._e()
               ])
             : _vm._e(),
           _vm._v(" "),
           _c("div", { staticClass: "role text-center" }, [
-            _c("h2", [_vm._v("你的身份是")]),
+            _c("p", { staticClass: "mb-10" }, [_vm._v("你的身份是")]),
+            _vm._v(" "),
+            _c("h2", {
+              domProps: { textContent: _vm._s(_vm.currentRole.translated_name) }
+            }),
             _vm._v(" "),
             _c("div", {
               staticClass: "img-circle profile player-detail mb-30",
               style:
                 "background-image: url(" + _vm.currentRole.avatar_path + ");"
-            }),
-            _vm._v(" "),
-            _c(
-              "button",
-              { staticClass: "btn btn-success", on: { click: _vm.pass } },
-              [_vm._v("确认身份")]
-            )
+            })
           ])
         ])
       : _vm._e()
@@ -44694,6 +44694,12 @@ if (false) {
      require("vue-hot-reload-api").rerender("data-v-0441455c", module.exports)
   }
 }
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);

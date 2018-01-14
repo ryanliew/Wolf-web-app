@@ -426,10 +426,12 @@ tr.is-user {
 }
 
 .slider {
-    background: rgba(0,0,0,0.7);
+    background: #191970;
     padding: 10vw;
     margin-top: -22px;
     height: calc(100vh - 50px);
+    position: relative;
+    z-index: 10;
 }
 
 .role-select .role {
@@ -437,6 +439,20 @@ tr.is-user {
     width: 100vw;
     padding: 10vw;
     height: calc(100vh - 50px);
+    position: fixed;
+    z-index: 5;
+    top: 0;
+}
+
+.confirm-btn {
+    position: fixed;
+    bottom: 100px;
+    left: 0;
+    width: 100vw;
+}
+
+.slider-show {
+    height: 125vh;
 }
 
 .players-seat {
