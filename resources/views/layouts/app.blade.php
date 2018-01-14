@@ -12,7 +12,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css?v=1.1') }}" rel="stylesheet">
-    <link href="{{ asset('css/wolf.css?v=1.5') }}" rel="stylesheet">
+    <link href="{{ asset('css/wolf.css?v=1.6') }}" rel="stylesheet">
     
     <!-- Add to homescreen manifest -->
     <link rel="manifest" href="manifest.json"> 
@@ -90,6 +90,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js?v=1.8') }}"></script>
+    <script src="{{ asset('js/app.js?v=1.9') }}"></script>
 </body>
 </html>

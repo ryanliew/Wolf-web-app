@@ -20,7 +20,7 @@
 				<div class="confirm-btn text-center">
 					<button class="btn btn-warning" @click="show" v-html="showText"></button>
 				</div>
-				<p v-if="loadingComplete" class="mt-20 text-center"><i class="fa fa-angle-double-up fa-2x"></i><br>请向上滑</p>
+				<p v-if="loadingComplete" class="scroll-up text-center"><i class="fa fa-angle-double-up fa-2x"></i><br>请向上滑</p>
 				<div class="slider-show" v-if="loadingComplete"></div>
 			</div>
 			<div class="role text-center">
