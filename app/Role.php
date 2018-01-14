@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Role extends Model
 {
-	protected $appends = ['avatar_path'];
+	protected $appends = ['avatar_path', 'translated_name'];
 
 	protected $with = ['lines'];
 
@@ -24,4 +24,9 @@ class Role extends Model
     {
     	return $this->hasMany('App\Line');
     }	
+
+    public function getTranslatedNameAttribute()
+    {
+    	return __('roles.' . $this->slug);
+    }
 }

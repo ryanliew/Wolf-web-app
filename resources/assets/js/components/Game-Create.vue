@@ -1,24 +1,39 @@
 <template>
 	<div class="game-create">
 		<label>上帝:</label>
-		<v-select 
-			:debounce="500"
-			:on-search="getJudge"
-			:options="potential_judge"
-			v-model="judge"
-			:on-change="refreshPlayers"
-			placeholder="请选择上帝..."
-			label="name">		
-		</v-select>
-		<br>
-		<label>玩家:</label>
-		<button class="btn btn-primary" @click="isSelecting=true">选择玩家</button>
+		<div>
+			<v-select 
+				:debounce="500"
+				:on-search="getJudge"
+				:options="potential_judge"
+				v-model="judge"
+				:on-change="refreshPlayers"
+				placeholder="请选择上帝..."
+				label="name">		
+			</v-select>
+		</div>
+		<div class="row">
+			<label class="col-xs-5" for="auto-fill">自动分配身份</label>
+			<div class="col-xs-7">
+				<input type="checkbox" id="auto-fill" v-model="autofill">
+			</div>
+		</div>
+		<div class="row">
+			<label class="col-xs-5">玩家:</label>
+			<div class="col-xs-7">
+				<button class="btn btn-primary" @click="isSelecting=true">选择玩家</button>
+			</div>
+		</div>
 		
 		<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-show="isSelecting" :players="potential_players" :initialPlayers="this.previous_players"></players-select>
 		<br>
-
-		<label>总人数: </label> <span v-text="this.players.length"></span>
-		<br>
+		
+		<div class="row">
+			<label class="col-xs-5">总人数: </label>
+			<div class="col-xs-7">
+		 		<span v-text="this.players.length"></span>
+		 	</div>
+		</div>
 		<div class="row">
 			<div class="col-xs-12">
 				<label>开启身份:</label>
@@ -86,7 +101,8 @@
 				new_name: "",
 				roles: [],
 				selected_roles: [5,6],
-				isSelecting: false
+				isSelecting: false,
+				autofill: false
 			};
 		},
 
@@ -160,11 +176,13 @@
 
 					judge: this.judge.id,
 					players: this.players,
-					roles: this.selected_roles
+					roles: this.selected_roles,
+					autofill: this.autofill
 
 				}).then(resp => {
 					//console.log(resp);
-					window.location.href = "/game/" + resp.data;
+					var link = this.autofill ? "/game/roles/" + resp.data : "/game/" + resp.data;
+					window.location.href = link;
 				});
 			},
 
