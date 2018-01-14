@@ -121,12 +121,7 @@
 			axios.get('/ajax/user/profile')
 				.then(resp => {
 					this.judge = resp.data;
-					axios.get('/ajax/previous-players')
-					.then(resp => {
-						//Vue.set(this.previous_players, resp.data);
-						this.previous_players = resp.data;
-						this.players = resp.data.map(a => a.id);
-					});
+					this.getPreviousPlayers();
 				});
 
 			
@@ -146,6 +141,22 @@
 					});
 			},
 
+			getPreviousPlayers() {
+				axios.get('/ajax/previous-players')
+					.then(resp => {
+						//Vue.set(this.previous_players, resp.data);
+						this.previous_players = resp.data;
+						var judgeid = this.judge.id;
+						this.players = resp.data.map(a => a.id);
+						_.remove(this.players, function(id){
+							return id == judgeid;
+						});
+						_.remove(this.previous_players, function(player){
+							return player.id == judgeid;
+						});
+					});
+			},
+
 			refreshPlayers(judge){
 				this.judge = judge;
 				this.players = [];
@@ -155,7 +166,7 @@
 					}
 				}).then(resp => {
 					this.potential_players = resp.data;
-					
+					this.getPreviousPlayers();
 				});
 			},
 

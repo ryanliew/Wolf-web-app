@@ -45,7 +45,7 @@
                             <li><a href="{{ route('register') }}">注册</a></li>
                         @else
                             <li>
-                                <a href="/notice">公告</a>
+                                <a href="/notice">更新记录</a>
                             </li>
                             <li>
                                 <a href="/home">排行榜</a>
@@ -90,6 +90,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js?v=1.9') }}"></script>
+    <script src="{{ asset('js/app.js?v=2.0') }}"></script>
 </body>
 </html>
