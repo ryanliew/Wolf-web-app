@@ -24,6 +24,7 @@ Vue.component('flash', require('./components/Flash.vue'));
 Vue.component('game-create', require('./components/Game-Create.vue'));
 Vue.component('game-details', require('./components/Game-Details.vue'));
 Vue.component('user-profile', require('./components/User-Profile.vue'));
+Vue.component('player-roles', require('./components/Player-Roles.vue'));
 Vue.component('v-select', 'vue-select');
 
 const app = new Vue({

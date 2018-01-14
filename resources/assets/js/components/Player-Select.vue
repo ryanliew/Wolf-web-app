@@ -15,20 +15,22 @@
 		props: ['player', 'initialSelection'],
 		data() {
 			return {
-				selected: this.initialSelection
+				selected: this.initialSelection,
+				userSelected: false
 			};
 		},
 
 		methods: {
 			toggled() {
 				this.selected = !this.selected;
+				this.userSelected = true;
 				this.$emit('selectionChanged', [this.selected, this.player.id]);
 			}
 		},
 
 		computed: {
 			actuallySelected() {
-				return this.initialSelection || this.selected;
+				return (!this.userSelected && this.initialSelection) || this.selected;
 			}
 		}	
 	}

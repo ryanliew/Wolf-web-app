@@ -33,6 +33,7 @@ Route::prefix('games')->middleware(['auth'])->group(function() {
 
 });
 
+Route::get('/game/roles/{game}', 'GameController@roles');
 Route::get('/game/{game}', 'GameController@show');
 Route::delete('/game/{game}', 'GameController@destroy');
 
