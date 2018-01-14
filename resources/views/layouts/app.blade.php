@@ -90,6 +90,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js?v=1.9') }}"></script>
+    <script src="{{ asset('js/app.js?v=2.0') }}"></script>
 </body>
 </html>

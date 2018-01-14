@@ -42733,13 +42733,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 		axios.get('/ajax/user/profile').then(function (resp) {
 			_this.judge = resp.data;
-			axios.get('/ajax/previous-players').then(function (resp) {
-				//Vue.set(this.previous_players, resp.data);
-				_this.previous_players = resp.data;
-				_this.players = resp.data.map(function (a) {
-					return a.id;
-				});
-			});
+			_this.getPreviousPlayers();
 		});
 	},
 
@@ -42759,8 +42753,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				loading(false);
 			});
 		},
-		refreshPlayers: function refreshPlayers(judge) {
+		getPreviousPlayers: function getPreviousPlayers() {
 			var _this3 = this;
+
+			axios.get('/ajax/previous-players').then(function (resp) {
+				//Vue.set(this.previous_players, resp.data);
+				_this3.previous_players = resp.data;
+				var judgeid = _this3.judge.id;
+				_this3.players = resp.data.map(function (a) {
+					return a.id;
+				});
+				_.remove(_this3.players, function (id) {
+					return id == judgeid;
+				});
+				_.remove(_this3.previous_players, function (player) {
+					return player.id == judgeid;
+				});
+			});
+		},
+		refreshPlayers: function refreshPlayers(judge) {
+			var _this4 = this;
 
 			this.judge = judge;
 			this.players = [];
@@ -42769,11 +42781,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					not: this.judge.id
 				}
 			}).then(function (resp) {
-				_this3.potential_players = resp.data;
+				_this4.potential_players = resp.data;
+				_this4.getPreviousPlayers();
 			});
 		},
 		getPlayers: function getPlayers(search, loading) {
-			var _this4 = this;
+			var _this5 = this;
 
 			loading(true);
 			axios.get('/ajax/players', {
@@ -42781,12 +42794,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 					not: this.judge.id
 				}
 			}).then(function (resp) {
-				_this4.potential_players = resp.data;
+				_this5.potential_players = resp.data;
 				loading(false);
 			});
 		},
 		createGame: function createGame() {
-			var _this5 = this;
+			var _this6 = this;
 
 			axios.post('/games/create', {
 
@@ -42797,19 +42810,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 			}).then(function (resp) {
 				//console.log(resp);
-				var link = _this5.autofill ? "/game/roles/" + resp.data : "/game/" + resp.data;
+				var link = _this6.autofill ? "/game/roles/" + resp.data : "/game/" + resp.data;
 				window.location.href = link;
 			});
 		},
 		createPlayer: function createPlayer() {
-			var _this6 = this;
+			var _this7 = this;
 
 			axios.post('/ajax/players/create', {
 				name: this.new_name
 			}).then(function (resp) {
-				_this6.create_player = false;
-				_this6.new_name = "";
-				_this6.getJudge();
+				_this7.create_player = false;
+				_this7.new_name = "";
+				_this7.getJudge();
 			});
 		},
 		toggled: function toggled(data) {
