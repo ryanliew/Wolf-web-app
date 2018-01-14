@@ -99,6 +99,7 @@
 					this.seat++;
 					this.setPlayer();
 					this.blocked = true;
+					window.scrollTo(0,0);
 					this.loadingComplete = false;
 				}
 			},

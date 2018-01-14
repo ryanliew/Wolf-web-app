@@ -44552,6 +44552,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				this.seat++;
 				this.setPlayer();
 				this.blocked = true;
+				window.scrollTo(0, 0);
 				this.loadingComplete = false;
 			}
 		},
