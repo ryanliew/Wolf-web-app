@@ -83,12 +83,11 @@
 </template>
 
 <script>
-	import vSelect from "vue-select";
 	import PlayersSelect from "./Players-Select.vue";
 	export default {
 		props: [''],
 		
-		components: {vSelect, PlayersSelect},
+		components: {PlayersSelect},
 		
 		data() {
 			return {

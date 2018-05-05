@@ -1,4 +1,4 @@
-
+import vuescroll from 'vue-scroll';
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -10,6 +10,8 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 window.events = new Vue();
+
+Vue.use(vuescroll);
 
 window.flash = function(message, level = 'success'){
  	window.events.$emit('flash', {message, level});

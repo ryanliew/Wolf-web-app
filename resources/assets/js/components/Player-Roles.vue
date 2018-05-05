@@ -12,21 +12,24 @@
 
 			<button class="btn btn-primary" @click="start = true">开始身份抽取</button>
 		</div>
-		<div v-if="start">
+		<div v-if="start" class="slider-container" v-scroll:throttle="{fn: onScroll, throttle: 500 }">
 			<div class="slider text-center" v-if="blocked">
 				<p class="mb-10">请把手机交给</p>
 				<h2 v-text="currentPlayer.name"></h2>
 				<div class="img-circle profile player-detail mb-30" :style="'background-image: url(' + currentPlayer.avatar_path + ');'"></div>
 				<div class="confirm-btn text-center">
-					<button class="btn btn-warning" @click="show" v-html="showText"></button>
+					<button class="btn btn-warning" v-if="!loadingComplete" @click="show" v-html="showText"></button>
 				</div>
 				<p v-if="loadingComplete" class="scroll-up text-center"><i class="fa fa-angle-double-up fa-2x"></i><br>请向上滑</p>
 				<div class="slider-show" v-if="loadingComplete"></div>
 			</div>
-			<div class="role text-center">
+			<div class="role text-center" :class="roleActive">
 				<p class="mb-10">你的身份是</p>
 				<h2 v-text="currentRole.translated_name"></h2>
 				<div class="img-circle profile player-detail mb-30" :style="'background-image: url(' + currentRole.avatar_path + ');'"></div>
+				<div class="confirm-btn text-center">
+					<button class="btn btn-warning" v-if="loadingComplete" @click="pass" v-html="showText"></button>
+				</div>
 				
 			</div>
 		</div> 
@@ -50,6 +53,7 @@
 				showText: "读取身份",
 				orderedPlayers: [],
 				loadingComplete: false,
+				isRoleActive: false
 			};
 		},
 
@@ -120,12 +124,24 @@
 	                    params: {
 	                        user_id: this.currentPlayer.id
 	                    }
-	                }).then((resp) => { this.currentRole = resp.data; this.loadingComplete = true; this.showText = "确认身份" });
+	                }).then((resp) => { this.currentRole = resp.data; this.loadingComplete = true; this.showText = "确认身份"; });
 	            }
             },
 
+            onScroll(e, position)
+            {
+            	if(position.scrollTop > 500)
+            		e.target.scrollTop = e.target.scrollHeight;
+            	this.isRoleActive = position.scrollTop > 500;
+            }
 
 
+		},
+
+		computed: {
+			roleActive() {
+				return this.isRoleActive ? 'active' : '';
+			}
 		}
 	}
 </script>

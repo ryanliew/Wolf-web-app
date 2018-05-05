@@ -84,12 +84,14 @@
                 </div>
             </div>
         </nav>
-
-        @yield('content')
+        
+        <div class="content-container">
+            @yield('content')
+        </div>
         <flash message="{{ session('flash') }}"></flash>
     </div>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js?v=2.0') }}"></script>
+    <script src="{{ asset('js/app.js?v=2.1') }}"></script>
 </body>
 </html>

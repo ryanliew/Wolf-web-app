@@ -11,6 +11,10 @@ body {
     padding-left: 0;
 }
 
+.navbar {
+    margin-bottom: 0;
+}
+
 .margin-1 {
     margin: 10px 0;
 }
@@ -532,19 +536,28 @@ tr.is-user {
     background: #191970;
     padding: 10vw;
     margin-top: -22px;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 30px);
     position: relative;
     z-index: 10;
+}
+
+.slider-container {
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .role-select .role {
     max-width: 100vw;
     width: 100vw;
     padding: 10vw;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 30px);
     position: fixed;
     z-index: 5;
-    top: 0;
+    top: 20px;
+}
+
+.role-select .role.active {
+    z-index: 30;
 }
 
 .confirm-btn {
