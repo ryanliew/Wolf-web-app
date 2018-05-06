@@ -41,17 +41,21 @@ class AjaxController extends Controller
     
     public function getPlayersInGame(Game $game)
     {
-    	return $game->players()->toJson();
+    	return $game->gameUsers()->with('role.powers', 'user')->where('role_id', '<>', '1')->get()->toJson();
     }
 
+    public function getPowersInGame(Game $game)
+    {
+        return $game->gameUsers()->with('powerAsSource')->get()->pluck('powerAsSource')->flatten()->toJson();
+    }
     public function getRoles()
     {
-    	return Role::where('type', 'good')->orWhere('type', 'bad')->get()->toJson();
+    	return Role::with('powers')->where('type', 'good')->orWhere('type', 'bad')->get()->toJson();
     }
 
     public function getPlayerRoleInGame(Request $request, Game $game)
     {
-        $role = $game->users()->where('user_id', $request->user_id)->first()->pivot->role;
+        $role = $game->gameUsers()->where('user_id', $request->user_id)->first()->role;
 
         return $role->toJson();
     }
@@ -95,7 +99,8 @@ class AjaxController extends Controller
 
         foreach($users as $user)
         {
-            $game->users()->updateExistingPivot($user->id, ["score" => $user->pivot->role->default_score]);
+            $default_score = Role::find($user->pivot->role_id)->default_score;
+            $game->users()->updateExistingPivot($user->id, ["score" => $default_score]);
         }
 
         return response(200);
