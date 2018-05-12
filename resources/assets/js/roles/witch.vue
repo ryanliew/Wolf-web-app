@@ -28,7 +28,7 @@
 					game_id: this.game,
                     source: this.source,
                     target: this.save ? this.save : this.poison,
-                    power: this.save ? 2 : 5
+                    power: this.save ? 5 : 2
                 }).then(response => this.onSuccess(response));
 			},
 
