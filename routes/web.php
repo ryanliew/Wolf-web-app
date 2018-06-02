@@ -51,6 +51,8 @@ Route::prefix('ajax')->middleware(['auth'])->group(function() {
 	Route::get('/game/{game}/players', 'AjaxController@getPlayersInGame');
 	Route::post('/game/{game}/role', 'AjaxController@setRoleInGame');
 	Route::post('/game/{game}/status', 'AjaxController@setStatusInGame');
+	Route::get('/game/{game}/powers', 'AjaxController@getPowersInGame');
 	Route::post('/game/{game}/end', 'AjaxController@setEndGame');
 	Route::get('/game/{game}', 'AjaxController@getGame');
+	Route::post('/powers/execute', 'PowerController@execute');
 });

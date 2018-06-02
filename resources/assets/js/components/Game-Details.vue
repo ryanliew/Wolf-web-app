@@ -29,21 +29,39 @@
 			<button class="btn btn-danger"@click="win('bad')">狼人获胜</button>
 		</div>
 
-		<div v-if="show_lines" class="script-dialog text-center">
-			<img :src="this.orderedRoles[this.current_line].avatar_path"/>
-			<ul>
-				<li v-for="(line, index) in orderedLines" :key="line.id">
-					<span v-text="line.description"></span>
-				</li>
-			</ul>
-			
-			<button class="btn btn-danger btn-small" @click="isSelecting=true">设定玩家身份</button>
+		<div v-if="show_lines" class="script-dialog">
+			<div class="script-content text-center">
+				<img :src="this.orderedRoles[this.current_line].avatar_path"/>
+				<ul>
+					<li v-for="(line, index) in orderedLines" :key="line.id">
+						<span v-text="line.description"></span>
+					</li>
+				</ul>
+				
+				<button class="btn btn-danger btn-small" @click="isSelecting=true">设定玩家身份</button>
 
-			<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-if="isSelecting" :players="players" :initialPlayers="initialSelectedRole"></players-select>
+				<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-if="isSelecting" :players="players" :initialPlayers="initialSelectedRole"></players-select>
 
-			<hr>
-			<button class="btn btn-success" @click="nextLine">下一个</button>
-			<button class="btn btn-primary" @click="show_lines = false">返回</button>	
+				<hr>
+				<component :is="this.orderedRoles[this.current_line].slug" 
+							:game="game.id" 
+							:justKilled="just_killed" 
+							:source="initialSelectedRole[0].seat"
+							:witchSaved="witch_saved"
+							:witchPoisoned="witch_poisoned"
+							:has_save="has_save"
+							:has_poison="has_poison"
+							:last_guard="last_guard"
+							@killed="kill" 
+							@witchRevive="witchRevive"
+							@witchPoisoned="witchPoisoned"
+							@guarded="guarded" 
+							@next="nextLine"
+							@back="show_lines = false">	
+				</component>
+				<button class="btn btn-success" @click="nextLine">下一个</button>
+				<button class="btn btn-primary" @click="show_lines = false">返回</button>
+			</div>	
 		</div>
 	</div>
 </template>
@@ -69,7 +87,14 @@
 				current_line: 0,
 				isSelecting: false,
 				selectedRole: [],
-				initialSelectedRole: []
+				initialSelectedRole: [],
+				usedPowers: [],
+				just_killed: 0,
+				witch_saved: false,
+				witch_poisoned: '',
+				has_save: true,
+				has_poison: true,
+				last_guard: 0
 			};
 		},
 
@@ -84,20 +109,32 @@
 					.then(this.setGame);	
 			},
 
-			refresh(response) {
-				this.players = response.data;
-				axios.get('/ajax/game/'+ this.id + '/judge' )
-					.then(this.setJudge)
-			},
-
 			setGame(response) {
 				this.game = response.data;
 				axios.get('/ajax/game/' + this.id + '/players')
 							.then(this.refresh);
 			},
 
+			refresh(response) {
+				this.players = response.data;
+				axios.get('/ajax/game/'+ this.id + '/judge' )
+					.then(this.setJudge)
+			},
+
 			setJudge(response) {
 				this.judge = response.data;
+				axios.get('/ajax/game/' + this.id + '/powers')
+					.then(this.setPowers);
+			},
+
+			setPowers(response) {
+				this.usedPowers = response.data;
+				this.processPowers();
+			},
+
+			processPowers() {
+				this.has_save = _.filter(this.usedPowers, function(p){ return p.slug == 'revive'; }).length == 0;
+				this.has_poison = _.filter(this.usedPowers, function(p){ return p.slug == 'poison'; }).length == 0;
 			},
 
 			win(type) {
@@ -116,7 +153,7 @@
 			randomSelect() {
 				let deadPlayers = this.players.slice();
 				var alivePlayers = _.remove(deadPlayers, function(n) {
-					return n.pivot.is_alive;
+					return n.is_alive;
 				});
 				var key = _.random(0, alivePlayers.length - 1);
 				this.random = key + 1;
@@ -126,18 +163,45 @@
 			},
 
 			kill(index) {
-				this.players[index].pivot.is_alive = 0;
+				this.players[index].is_alive = 0;
+				this.just_killed = this.players[index].seat;
+
+				axios.post('/ajax/game/' + this.id + '/status', {
+                    user_id: this.players[index].user_id,
+                    alive: false
+                });
 			},
 
 			revive(index) {
-				this.players[index].pivot.is_alive = 1;
+				this.players[index].is_alive = 1;
+				axios.post('/ajax/game/' + this.id + '/status', {
+                    user_id: this.players[index].user_id,
+                    alive: true
+                });
+			},
+
+			witchRevive(index) {
+				this.witch_saved = true;
+				this.has_save = false;
+				this.revive(index);
+			},
+
+			witchPoisoned(index) {
+				this.witch_poisoned = index;
+				this.has_poison = false;
+				this.kill(index);
+			},
+
+			guarded(index) {
+				this.last_guard = index;
+				this.revive(index);
 			},
 
 			showLines(index) {
 				this.show_lines = true;
 				this.current_line = index;
 				this.lines = this.orderedRoles[this.current_line].lines;
-				this.initialSelectedRole = _.filter(this.players, function(o){ return o.pivot.role_id == this.currentRole.id; }.bind(this));
+				this.initialSelectedRole = _.filter(this.players, function(o){ return o.role_id == this.currentRole.id; }.bind(this));
 			},
 
 			hideLines() {
@@ -155,7 +219,7 @@
 					this.lines = this.orderedRoles[this.current_line].lines;
 				}
 
-				this.initialSelectedRole = _.filter(this.players, function(o){ return o.pivot.role_id == this.currentRole.id; }.bind(this));
+				this.initialSelectedRole = _.filter(this.players, function(o){ return o.role_id == this.currentRole.id; }.bind(this));
 			},
 
 			toggled(data) {
@@ -165,7 +229,7 @@
 					this.selectedRole[data[1]] = this.currentRole;
 				}
 
-				_.find(this.players, ['id', data[1]]).pivot.role_id = data[0] ? this.currentRole.id : 10;
+				_.find(this.players, ['id', data[1]]).role_id = data[0] ? this.currentRole.id : 10;
 
 				axios.post('/ajax/game/' + this.game.id + '/role', {
                     user_id: data[1],

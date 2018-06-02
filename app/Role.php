@@ -25,6 +25,11 @@ class Role extends Model
     	return $this->hasMany('App\Line');
     }	
 
+    public function powers()
+    {
+        return $this->hasMany('App\Power');
+    }
+
     public function getTranslatedNameAttribute()
     {
     	return __('roles.' . $this->slug);
