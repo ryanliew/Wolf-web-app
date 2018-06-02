@@ -169,7 +169,7 @@
 				axios.post('/ajax/game/' + this.id + '/status', {
                     user_id: this.players[index].user_id,
                     alive: false
-                }).then(this.fetch());
+                });
 			},
 
 			revive(index) {
@@ -177,7 +177,7 @@
 				axios.post('/ajax/game/' + this.id + '/status', {
                     user_id: this.players[index].user_id,
                     alive: true
-                }).then(this.fetch());
+                });
 			},
 
 			witchRevive(index) {

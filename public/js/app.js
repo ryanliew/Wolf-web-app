@@ -44729,14 +44729,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			axios.post('/ajax/game/' + this.id + '/status', {
 				user_id: this.players[index].user_id,
 				alive: false
-			}).then(this.fetch());
+			});
 		},
 		revive: function revive(index) {
 			this.players[index].is_alive = 1;
 			axios.post('/ajax/game/' + this.id + '/status', {
 				user_id: this.players[index].user_id,
 				alive: true
-			}).then(this.fetch());
+			});
 		},
 		witchRevive: function witchRevive(index) {
 			this.witch_saved = true;
