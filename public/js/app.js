@@ -44048,7 +44048,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		toggled: function toggled() {
 			this.selected = !this.selected;
 			this.userSelected = true;
-			this.$emit('selectionChanged', [this.selected, this.user.user_id]);
+			this.$emit('selectionChanged', [this.selected, this.user.id]);
 		}
 	},
 
