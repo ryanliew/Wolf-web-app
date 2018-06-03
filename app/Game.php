@@ -13,7 +13,17 @@ class Game extends Model
 
     public function users()
     {
-    	return $this->belongsToMany('App\User')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->using('App\GameUser')->withTimestamps();
+    	return $this->belongsToMany('App\User')->withPivot('role_id', 'score', 'status', 'is_alive', 'seat')->withTimestamps();
+    }
+
+    public function gameUsers()
+    {
+        return $this->hasMany('App\GameUser');
+    }
+
+    public function gamePlayers()
+    {
+        return $this->gameUsers()->where('role_id', '<>', '1')->get();
     }
 
     public function players()
@@ -56,7 +66,7 @@ class Game extends Model
 
     public function authenticate_user($user)
     {
-        return $this->is_concluded || !$this->players()->contains('id', $user);
+        return true;//$this->is_concluded || !$this->players()->contains('id', $user);
     }
     
     /***** Scopes *****/
