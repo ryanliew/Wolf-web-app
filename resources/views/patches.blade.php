@@ -8,7 +8,36 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-8 col-xs-12">
+				<!-- Patch v2.1 -->
+				<ul class="list-unstyled">
+			    	<li>
+			    		<b>v2.1 (5/5/2018)</b>
+			    		<ol>
+			    			<li>
+			    				身份抽取
+			    				<ol>
+			    					<li>身份抽取优化</li>
+			    				</ol>
+			    			</li>
+			    			<li>
+			    				新一季
+			    				<ol>
+			    					<li>分数重设</li>
+			    				</ol>
+			    			</li>
+			    			<li>
+			    				游戏/法官
+			    				<ol>
+			    					<li>当游戏进行中，所有玩家可直接进入游戏界面</li>
+			    					<li>法官可以使用其他人的手机</li>
+			    				</ol>
+			    			</li>
+			    		</ol>
+			    	</li>
+			    </ul>
+				<!-- End patch v2.1 -->
 				<!-- Patch v1.2 -->
+				<hr>
 				<ul class="list-unstyled">
 			    	<li>
 			    		<b>v1.2 (14/1/2018)</b>

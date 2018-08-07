@@ -1,4 +1,4 @@
-
+import vuescroll from 'vue-scroll';
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -10,6 +10,8 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 window.events = new Vue();
+
+Vue.use(vuescroll);
 
 window.flash = function(message, level = 'success'){
  	window.events.$emit('flash', {message, level});
@@ -25,6 +27,20 @@ Vue.component('game-create', require('./components/Game-Create.vue'));
 Vue.component('game-details', require('./components/Game-Details.vue'));
 Vue.component('user-profile', require('./components/User-Profile.vue'));
 Vue.component('player-roles', require('./components/Player-Roles.vue'));
+
+/**
+ * Powers actions
+ */
+Vue.component('wolf', require("./roles/wolf.vue"));
+Vue.component('witch', require("./roles/witch.vue"));
+Vue.component('fortune-teller', require("./roles/fortune-teller.vue"));
+Vue.component('demon', require("./roles/demon.vue"));
+Vue.component('guard', require("./roles/guard.vue"));
+Vue.component('assassin', require("./roles/assassin.vue"));
+Vue.component('hunter', require("./roles/hunter.vue"));
+Vue.component('white-wolf', require("./roles/white-wolf.vue"));
+
+
 Vue.component('v-select', 'vue-select');
 
 const app = new Vue({
