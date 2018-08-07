@@ -221,9 +221,6 @@ body {
     left: 0;
 }
 
-.name {
-    color: white;
-}
 
 .dead .name {
     color: #333;

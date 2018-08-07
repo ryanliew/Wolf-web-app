@@ -1,7 +1,7 @@
 
 // Fonts
 @import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
-@import url(//fonts.googleapis.com/earlyaccess/notosanssc.css); 
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 
 // Variables
 @import "variables";
@@ -11,3 +11,92 @@
 
 // Font awesome
 @import "node_modules/font-awesome/scss/font-awesome";
+
+.d-flex {
+	display: flex;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.flex-row {
+	flex-direction: row;
+}
+
+.flex-1 {
+	flex: 1;
+}
+
+.flex-wrap {
+	flex-wrap: wrap;
+}
+
+.player-card-container {
+	padding: 0 15px;
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.player-card {
+	border-radius: 15px;
+	background: white;
+	width: 100%;
+}
+
+.player-image {
+	border-top-left-radius: 15px;
+	border-bottom-left-radius: 15px;
+	width: 30%;
+	background-size: cover;
+	background-position: center;
+	margi-right: 10px;
+}
+
+.player-details {
+	color: black;
+	position: relative;
+}
+
+.player-details .header {
+	background-size: cover;
+	background-position: center;
+	position: relative;
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
+	padding: 10px 15px;
+}
+
+.player-details .footer {
+	padding-top: 10px;
+	position: relative;
+	z-index: 1;
+}
+
+.player-details .name {
+	color: white;
+	text-shadow: 1px 0px 5px rgba(0, 0, 0, 1);
+	font-size: 18px;
+	font-weight: bold;
+	position: relative;
+	z-index: 1;
+}
+
+.player-details .name .circle {
+	border-radius: 100%;
+	background: #3f51b5;
+	padding: 0 10px;
+	margin-right: 10px;
+}
+
+.player-details .overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.5);
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
+	z-index: 0;
+}

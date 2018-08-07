@@ -20,9 +20,9 @@
 
 		</div>
 		<div>
-			<ul class="list-inline player-list">
-		    	<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :selectedRole="selectedRole[player.id]" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
-			</ul>
+			<div class="d-flex flex-wrap">
+				<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :selectedRole="selectedRole[player.id]" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
+			</div>
 		</div>
 		<div class="row text-center" v-if="!game.is_concluded">
 			<button class="btn btn-success" @click="win('good')">好人获胜</button>

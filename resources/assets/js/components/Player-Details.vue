@@ -1,53 +1,32 @@
 <template>
+    <div class="player-card-container">
+        <div class="player-card d-flex">
+            <div class="player-image" :style="'background-image: url(' + avatar + ');'">
 
-    <li :class="classes" class="text-center">
-        <div class="row">
-            <span v-text="this.player.seat"></span>
-            <div class="col-xs-12">
-                <div class="img-circle profile player-detail" :style="'background-image: url(' + avatar + ');'"></div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <span class="name" v-text="player.short_name"></span>
+            <div class="player-details flex-1">
+
+                <div class="header" :style="'background-image: url(/img/roles/' + this.role.slug + '.jpg);'">
+                    <div class="overlay"></div>
+                    <div class="name d-flex">
+                        <div class="circle">{{ player.seat }}</div>
+                        <div class="flex-1">{{ player.user.name }} - {{ player.role.translated_name }}</div>
+                    </div>
+                    <div class="footer">
+                        <button class="btn btn-danger" v-if="this.player.is_alive && !is_concluded" @click="kill">出局</button>
+                        <button class="btn btn-success" v-if="!this.player.is_alive && !is_concluded" @click="revive">复活</button>
+                    </div>
+                </div>
+                
                 <div class="player-kill-badge">
                     <div v-if="player.is_killed_by_poison" class="img-circle" style="background-image: url(/img/roles/witch.jpg);"></div>
                     <div v-if="player.is_killed_by_hunter" class="img-circle" style="background-image: url(/img/roles/hunter.jpg);"></div>
                     <div v-if="player.is_killed_by_assassin" class="img-circle" style="background-image: url(/img/roles/assassin.jpg);"></div>
                 </div>
+                
             </div>
         </div>
-        <div class="row">
-            <div class="col-xs-12">
-                <div class="roles-list" v-if="(this.selecting_role) && !is_concluded">
-                    <div v-if="this.selecting_role && !is_concluded">
-                        <h4>为 <span v-text="this.player.name"></span> 选择身份</h4>
-                        <hr>
-                        <h5>好人阵营</h5>
-                        <ul class="list-inline good-side">
-                            <li v-for="(role, index) in rolesSelection" :key="role.id" v-if="role.id !== 1 && role.type == 'good'" @click="select(role)">
-                                <img class="role" :src="'/img/roles/' + role.slug + '.jpg'">
-                            </li>
-                        </ul>
-                        <h5>狼人阵营</h5>
-                        <ul class="list-inline bad-side">
-                            <li v-for="(role, index) in rolesSelection" :key="role.id" v-if="role.id !== 1 && role.type == 'bad'"  @click="select(role)">
-                                <img class="role" :src="'/img/roles/' + role.slug + '.jpg'">
-                            </li>
-                        </ul>
-                        <hr>
-                        <button class="btn btn-primary" @click="selecting_role = false">返回</button>
-                    </div>
-                </div>
-                <div v-else>
-                    <img class="margin-1 role" :src="'/img/roles/' + this.role.slug + '.jpg'" v-if="this.role" @click="selecting_role = true">
-                    <button class="btn btn-danger" v-if="this.player.is_alive && !is_concluded" @click="kill">出局</button>
-                    <button class="btn btn-success" v-if="!this.player.is_alive && !is_concluded" @click="revive">复活</button>
-                </div>
-            </div>
-        </div>
-    </li>
-
+    </div>
 </template>
 
 <script>

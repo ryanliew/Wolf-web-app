@@ -44887,27 +44887,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole'],
@@ -44984,24 +44963,60 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("li", { staticClass: "text-center", class: _vm.classes }, [
-    _c("div", { staticClass: "row" }, [
-      _c("span", { domProps: { textContent: _vm._s(this.player.seat) } }),
+  return _c("div", { staticClass: "player-card-container" }, [
+    _c("div", { staticClass: "player-card d-flex" }, [
+      _c("div", {
+        staticClass: "player-image",
+        style: "background-image: url(" + _vm.avatar + ");"
+      }),
       _vm._v(" "),
-      _c("div", { staticClass: "col-xs-12" }, [
-        _c("div", {
-          staticClass: "img-circle profile player-detail",
-          style: "background-image: url(" + _vm.avatar + ");"
-        })
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-xs-12" }, [
-        _c("span", {
-          staticClass: "name",
-          domProps: { textContent: _vm._s(_vm.player.short_name) }
-        }),
+      _c("div", { staticClass: "player-details flex-1" }, [
+        _c(
+          "div",
+          {
+            staticClass: "header",
+            style:
+              "background-image: url(/img/roles/" + this.role.slug + ".jpg);"
+          },
+          [
+            _c("div", { staticClass: "overlay" }),
+            _vm._v(" "),
+            _c("div", { staticClass: "name d-flex" }, [
+              _c("div", { staticClass: "circle" }, [
+                _vm._v(_vm._s(_vm.player.seat))
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "flex-1" }, [
+                _vm._v(
+                  _vm._s(_vm.player.user.name) +
+                    " - " +
+                    _vm._s(_vm.player.role.translated_name)
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "footer" }, [
+              this.player.is_alive && !_vm.is_concluded
+                ? _c(
+                    "button",
+                    { staticClass: "btn btn-danger", on: { click: _vm.kill } },
+                    [_vm._v("出局")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              !this.player.is_alive && !_vm.is_concluded
+                ? _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success",
+                      on: { click: _vm.revive }
+                    },
+                    [_vm._v("复活")]
+                  )
+                : _vm._e()
+            ])
+          ]
+        ),
         _vm._v(" "),
         _c("div", { staticClass: "player-kill-badge" }, [
           _vm.player.is_killed_by_poison
@@ -45029,134 +45044,6 @@ var render = function() {
               })
             : _vm._e()
         ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col-xs-12" }, [
-        this.selecting_role && !_vm.is_concluded
-          ? _c("div", { staticClass: "roles-list" }, [
-              this.selecting_role && !_vm.is_concluded
-                ? _c("div", [
-                    _c("h4", [
-                      _vm._v("为 "),
-                      _c("span", {
-                        domProps: { textContent: _vm._s(this.player.name) }
-                      }),
-                      _vm._v(" 选择身份")
-                    ]),
-                    _vm._v(" "),
-                    _c("hr"),
-                    _vm._v(" "),
-                    _c("h5", [_vm._v("好人阵营")]),
-                    _vm._v(" "),
-                    _c(
-                      "ul",
-                      { staticClass: "list-inline good-side" },
-                      _vm._l(_vm.rolesSelection, function(role, index) {
-                        return role.id !== 1 && role.type == "good"
-                          ? _c(
-                              "li",
-                              {
-                                key: role.id,
-                                on: {
-                                  click: function($event) {
-                                    _vm.select(role)
-                                  }
-                                }
-                              },
-                              [
-                                _c("img", {
-                                  staticClass: "role",
-                                  attrs: {
-                                    src: "/img/roles/" + role.slug + ".jpg"
-                                  }
-                                })
-                              ]
-                            )
-                          : _vm._e()
-                      })
-                    ),
-                    _vm._v(" "),
-                    _c("h5", [_vm._v("狼人阵营")]),
-                    _vm._v(" "),
-                    _c(
-                      "ul",
-                      { staticClass: "list-inline bad-side" },
-                      _vm._l(_vm.rolesSelection, function(role, index) {
-                        return role.id !== 1 && role.type == "bad"
-                          ? _c(
-                              "li",
-                              {
-                                key: role.id,
-                                on: {
-                                  click: function($event) {
-                                    _vm.select(role)
-                                  }
-                                }
-                              },
-                              [
-                                _c("img", {
-                                  staticClass: "role",
-                                  attrs: {
-                                    src: "/img/roles/" + role.slug + ".jpg"
-                                  }
-                                })
-                              ]
-                            )
-                          : _vm._e()
-                      })
-                    ),
-                    _vm._v(" "),
-                    _c("hr"),
-                    _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        on: {
-                          click: function($event) {
-                            _vm.selecting_role = false
-                          }
-                        }
-                      },
-                      [_vm._v("返回")]
-                    )
-                  ])
-                : _vm._e()
-            ])
-          : _c("div", [
-              this.role
-                ? _c("img", {
-                    staticClass: "margin-1 role",
-                    attrs: { src: "/img/roles/" + this.role.slug + ".jpg" },
-                    on: {
-                      click: function($event) {
-                        _vm.selecting_role = true
-                      }
-                    }
-                  })
-                : _vm._e(),
-              _vm._v(" "),
-              this.player.is_alive && !_vm.is_concluded
-                ? _c(
-                    "button",
-                    { staticClass: "btn btn-danger", on: { click: _vm.kill } },
-                    [_vm._v("出局")]
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              !this.player.is_alive && !_vm.is_concluded
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-success",
-                      on: { click: _vm.revive }
-                    },
-                    [_vm._v("复活")]
-                  )
-                : _vm._e()
-            ])
       ])
     ])
   ])
@@ -45240,8 +45127,8 @@ var render = function() {
     _vm._v(" "),
     _c("div", [
       _c(
-        "ul",
-        { staticClass: "list-inline player-list" },
+        "div",
+        { staticClass: "d-flex flex-wrap" },
         _vm._l(_vm.players, function(player, index) {
           return _c("player-details", {
             key: player.id,
