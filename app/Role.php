@@ -8,7 +8,7 @@ class Role extends Model
 {
 	protected $appends = ['avatar_path', 'translated_name'];
 
-	protected $with = ['lines'];
+	protected $with = ['lines', 'actions'];
 
 	public function getAvatarPathAttribute()
 	{
@@ -28,6 +28,11 @@ class Role extends Model
     public function powers()
     {
         return $this->hasMany('App\Power');
+    }
+
+    public function actions()
+    {
+        return $this->hasMany('App\Action');
     }
 
     public function getTranslatedNameAttribute()

@@ -9,7 +9,7 @@ class Game extends Model
     //
     protected $guarded = [];
 
-    protected $with = ['roles'];
+    protected $with = ['roles', 'nights'];
 
     public function users()
     {
@@ -39,6 +39,11 @@ class Game extends Model
     public function roles()
     {
         return $this->belongsToMany('App\Role')->withTimestamps();
+    }
+
+    public function nights()
+    {
+        return $this->hasMany('App\Night');
     }
 
     public function getWinSideImgAttribute()

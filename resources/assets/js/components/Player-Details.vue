@@ -1,29 +1,27 @@
 <template>
-    <div class="player-card-container">
+    <div class="player-card-container" :class="classes" >
         <div class="player-card d-flex">
             <div class="player-image" :style="'background-image: url(' + avatar + ');'">
-
+                <div class="overlay"></div>
+                <img :src="'/img/actions/' + die + '.png'" :class="'marking ' + die" v-if="die !== 'N/A'"/>
             </div>
-            <div class="player-details flex-1">
+            <div class="player-details flex-1 d-flex flex-col">
 
-                <div class="header" :style="'background-image: url(/img/roles/' + this.role.slug + '.jpg);'">
+                <div class="header flex-1" :style="'background-image: url(/img/roles/' + this.role.slug + '.jpg);'">
                     <div class="overlay"></div>
                     <div class="name d-flex">
                         <div class="circle">{{ player.seat }}</div>
                         <div class="flex-1">{{ player.user.name }} - {{ player.role.translated_name }}</div>
                     </div>
-                    <div class="footer">
-                        <button class="btn btn-danger" v-if="this.player.is_alive && !is_concluded" @click="kill">出局</button>
-                        <button class="btn btn-success" v-if="!this.player.is_alive && !is_concluded" @click="revive">复活</button>
+                    <div class="footer d-flex flex-wrap actions">
+                        <button class="btn btn-danger" v-for="action in actions" v-if="player.is_alive && !is_concluded && action.type == 'alive' " @click="kill(action.slug, action.id)"><img :src="'/img/actions/' + action.icon"></button>
+                        <button class="btn btn-success" v-for="action in actions" v-if="!player.is_alive && !is_concluded && action.type == 'dead' " @click="revive(action.slug, action.id)"><img :src="'/img/actions/' + action.icon"></button>
+                        <button class="btn btn-primary" v-for="action in actions" v-if="player.is_alive && !is_concluded && action.type == 'mark' " @click="mark(action.slug, action.id)"><img :src="'/img/actions/' + action.icon"></button>
                     </div>
-                </div>
-                
-                <div class="player-kill-badge">
-                    <div v-if="player.is_killed_by_poison" class="img-circle" style="background-image: url(/img/roles/witch.jpg);"></div>
-                    <div v-if="player.is_killed_by_hunter" class="img-circle" style="background-image: url(/img/roles/hunter.jpg);"></div>
-                    <div v-if="player.is_killed_by_assassin" class="img-circle" style="background-image: url(/img/roles/assassin.jpg);"></div>
-                </div>
-                
+                    <div class="markings">
+                        <img v-for="history in histories" :src="'/img/actions/' + history + '.png'" :class="'marking ' + history" v-if="history !== 'N/A'"/>
+                    </div>
+                </div>                
             </div>
         </div>
     </div>
@@ -31,7 +29,7 @@
 
 <script>
 	export default {
-		props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole'],
+		props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole', 'highlighted', 'actions', 'night'],
 		data() {
 			return {
 				initialRole: false,
@@ -39,24 +37,53 @@
                 status: "Alive",
                 selecting_role: false,
                 avatar: this.player.user.avatar_path,
-                role_override: false
+                role_override: false,
+                isWitchKill: false,
+                isWolfKill: false,
+                isHunterKill: false,
+                isAssassinKill: false,
+                isVoted: false
 			};
 		},
 
         methods: {
-            kill() {
+            kill(slug, id) {
+                axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", {status: slug, action: id, night: this.night})
+                    .then(response => this.killSuccess(response))
+                    .catch(error => this.kill(slug, id));
+                
+            },
+
+            killSuccess(response) {
                 this.status = "Dead";
                 this.alive = false;
                 
-                this.$emit('killed', this.player.seat);
-
+                this.$emit('killed', {seat: this.player.seat, status: response.data.status});
             },
 
-            revive() {
+            revive(slug, id) {
+                axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", {status: slug, action: id, night: this.night})
+                    .then(response => this.reviveSuccess(response))
+                    .catch(error => this.revive(slug, id));
+            },
+
+            reviveSuccess(response) {
                 this.status = "Alive";
                 this.alive = true;
 
-                this.$emit('revived', this.player.seat);
+                this.$emit('revived', {seat: this.player.seat, status: response.data.status});
+            },
+
+            mark(slug, id) {
+                axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", {status: slug, action: id, night: this.night})
+                    .then(response => this.markSuccess(response))
+                    .catch(error => this.mark(slug));  
+            },
+
+            markSuccess(response) {
+                this.status = "";
+
+                this.$emit('marked', {seat: this.player.seat, status: response.data.status});
             },
 
             select(role) {
@@ -85,11 +112,25 @@
 
         computed: {
             classes() {
-                return [this.player.is_alive ? "alive" : "dead"];
+                return [
+                        this.player.is_alive ? "alive" : "dead",
+                        this.player.is_marked ? "mark_" + this.die : ""
+                        ];
             },
 
             role() {
                 return this.selectedRole && !this.role_override ? this.selectedRole : this.initialRole;
+            },
+
+            histories() {
+                if(this.player.status)
+                    return this.player.status.split(",");
+                return "";
+            },
+
+            die() {
+                if(this.player.status)
+                    return _.last(this.histories);
             }
         }
 

@@ -2,10 +2,11 @@
 	<div>
 		<div class="text-center">
 			<h4>上帝: <span v-text="this.judge.name"></span></h4>
-			<p><b>指示顺序:</b></p>
+			<game-night :night="night" @next="nextNight" :scroll-y="scrollY" :deads="deads"></game-night>
+			<p class="mt-2"><b>指示顺序:</b></p>
 			
 			<ul class="list-inline instructions">
-				<li v-for="(role, index) in orderedRoles" :key="role.id" v-if="role.id !== 5">
+				<li v-for="(role, index) in orderedRoles" :key="role.id" v-if="role.id !== 5 && (role.id !== 20 || night == 1)">
 					<img :src="role.avatar_path" @click="showLines(index)">
 				</li>
 			</ul>
@@ -19,12 +20,12 @@
 			</div>
 
 		</div>
-		<div>
+		<div class="mt-2">
 			<div class="d-flex flex-wrap">
-				<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :selectedRole="selectedRole[player.id]" :is_concluded="game.is_concluded" @killed="kill(index)" @revived="revive(index)"></player-details>
+				<player-details v-for="(player, index) in players" :key="player.id" :player="player" :rolesSelection="game.roles" :gameId="id" :selectedRole="selectedRole[player.id]" :is_concluded="game.is_concluded" :actions="actions" :night="night" @killed="kill" @revived="revive" @marked="mark"></player-details>
 			</div>
 		</div>
-		<div class="row text-center" v-if="!game.is_concluded">
+		<div class="row text-center mb-2" v-if="!game.is_concluded">
 			<button class="btn btn-success" @click="win('good')">好人获胜</button>
 			<button class="btn btn-danger"@click="win('bad')">狼人获胜</button>
 		</div>
@@ -43,6 +44,7 @@
 				<players-select @selectionChanged="toggled" @closed="isSelecting=false" v-if="isSelecting" :players="players" :initialPlayers="initialSelectedRole"></players-select>
 
 				<hr>
+				<!-- 
 				<component :is="this.orderedRoles[this.current_line].slug" 
 							:game="game.id" 
 							:justKilled="just_killed" 
@@ -58,7 +60,7 @@
 							@guarded="guarded" 
 							@next="nextLine"
 							@back="show_lines = false">	
-				</component>
+				</component> -->
 				<button class="btn btn-success" @click="nextLine">下一个</button>
 				<button class="btn btn-primary" @click="show_lines = false">返回</button>
 			</div>	
@@ -69,11 +71,12 @@
 <script>
 	import PlayerDetails from './Player-Details.vue';
 	import PlayersSelect from './Players-Select.vue';
+	import GameNight from './Game-Night.vue';
 
 	export default {
-		components: { PlayerDetails, PlayersSelect },
+		components: { PlayerDetails, PlayersSelect, GameNight },
 
-		props: ['id'],
+		props: ['id', 'scrollY'],
 
 		data() {
 			return {
@@ -94,7 +97,10 @@
 				witch_poisoned: '',
 				has_save: true,
 				has_poison: true,
-				last_guard: 0
+				last_guard: 0,
+				actions: [],
+				night: 1,
+				deads: []
 			};
 		},
 
@@ -112,13 +118,34 @@
 			setGame(response) {
 				this.game = response.data;
 				axios.get('/ajax/game/' + this.id + '/players')
-							.then(this.refresh);
+							.then(this.refresh)
+							.catch(error => this.setGame(response));
+
+				_.forEach(this.game.roles, function(role){
+					_.forEach(role.actions, function(action){
+						if(! _.includes(this.actions, action))
+							this.actions.push(action);
+					}.bind(this));	
+				}.bind(this));
+
+
+				this.night = this.game.nights ? this.game.nights[this.game.nights.length - 1].night : 1;
 			},
 
 			refresh(response) {
+
+				_.forEach(response.data, function(player){
+					player.is_marked = false;
+				});
+
 				this.players = response.data;
+
 				axios.get('/ajax/game/'+ this.id + '/judge' )
 					.then(this.setJudge)
+					.catch(error => this.refresh(response));
+
+
+				this.propagateAction();
 			},
 
 			setJudge(response) {
@@ -162,22 +189,72 @@
 				this.sequence = sequence[_.random(0, sequence.length - 1)];
 			},
 
-			kill(index) {
+			kill(data) {
+				let index = data.seat - 1;
 				this.players[index].is_alive = 0;
 				this.just_killed = this.players[index].seat;
+
+				this.players[index].status = data.status;
+
+				this.deads.push(data.seat);
 
 				axios.post('/ajax/game/' + this.id + '/status', {
                     user_id: this.players[index].user_id,
                     alive: false
                 });
+
+                this.propagateAction();
 			},
 
-			revive(index) {
+			revive(data) {
+				let index = data.seat - 1;
 				this.players[index].is_alive = 1;
+				this.just_killed = this.players[index].seat;
 				axios.post('/ajax/game/' + this.id + '/status', {
                     user_id: this.players[index].user_id,
                     alive: true
                 });
+
+                this.players[index].status = data.status;
+
+                this.propagateAction();
+			},
+
+			mark(data) {
+				let index = data.seat - 1;
+
+				this.players[index].status = data.status;
+				this.players[index].is_marked = true;
+
+                this.propagateAction();
+			},
+
+			propagateAction() {
+				let spliceIndex = [];
+
+				_.forEach(this.actions, function(action, key){
+					if( _.filter(this.players, function(player){
+						return player.status.includes(action.slug);
+					}.bind(this)).length >= action.count ) {
+						spliceIndex.push(key);
+					}
+				}.bind(this));
+
+				// console.log("Need to remove");
+				// console.log(spliceIndex);
+
+				_.forEach(spliceIndex, function(index){
+					this.actions.splice(index, 1);
+				}.bind(this));
+			},
+
+			nextNight() {
+				this.night++;
+				_.forEach(this.players, function(player){
+					player.is_marked = false;
+				});
+
+				this.deads = [];
 			},
 
 			witchRevive(index) {
@@ -236,8 +313,6 @@
                     role_id: this.currentRole.id
                 });
 			}
-
-
 		},
 
 		computed: {

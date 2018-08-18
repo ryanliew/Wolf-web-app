@@ -1280,7 +1280,7 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(17);
-module.exports = __webpack_require__(110);
+module.exports = __webpack_require__(113);
 
 
 /***/ }),
@@ -1319,25 +1319,36 @@ window.flash = function (message) {
 Vue.component('flash', __webpack_require__(57));
 Vue.component('game-create', __webpack_require__(65));
 Vue.component('game-details', __webpack_require__(74));
-Vue.component('user-profile', __webpack_require__(80));
-Vue.component('player-roles', __webpack_require__(83));
+Vue.component('user-profile', __webpack_require__(83));
+Vue.component('player-roles', __webpack_require__(86));
 
 /**
  * Powers actions
  */
-Vue.component('wolf', __webpack_require__(86));
-Vue.component('witch', __webpack_require__(89));
-Vue.component('fortune-teller', __webpack_require__(92));
-Vue.component('demon', __webpack_require__(95));
-Vue.component('guard', __webpack_require__(98));
-Vue.component('assassin', __webpack_require__(101));
-Vue.component('hunter', __webpack_require__(104));
-Vue.component('white-wolf', __webpack_require__(107));
+Vue.component('wolf', __webpack_require__(89));
+Vue.component('witch', __webpack_require__(92));
+Vue.component('fortune-teller', __webpack_require__(95));
+Vue.component('demon', __webpack_require__(98));
+Vue.component('guard', __webpack_require__(101));
+Vue.component('assassin', __webpack_require__(104));
+Vue.component('hunter', __webpack_require__(107));
+Vue.component('white-wolf', __webpack_require__(110));
 
 Vue.component('v-select', 'vue-select');
 
 var app = new Vue({
-  el: '#app'
+  el: '#app',
+  data: {
+    scrollY: null
+  },
+
+  mounted: function mounted() {
+    var _this = this;
+
+    window.addEventListener('scroll', function (event) {
+      _this.scrollY = Math.round(window.scrollY);
+    });
+  }
 });
 
 /***/ }),
@@ -44524,7 +44535,7 @@ var normalizeComponent = __webpack_require__(0)
 /* script */
 var __vue_script__ = __webpack_require__(75)
 /* template */
-var __vue_template__ = __webpack_require__(79)
+var __vue_template__ = __webpack_require__(82)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -44571,6 +44582,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__Player_Details_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__Players_Select_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Game_Night_vue__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Game_Night_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__Game_Night_vue__);
 //
 //
 //
@@ -44639,14 +44652,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-	components: { PlayerDetails: __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default.a, PlayersSelect: __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default.a },
+	components: { PlayerDetails: __WEBPACK_IMPORTED_MODULE_0__Player_Details_vue___default.a, PlayersSelect: __WEBPACK_IMPORTED_MODULE_1__Players_Select_vue___default.a, GameNight: __WEBPACK_IMPORTED_MODULE_2__Game_Night_vue___default.a },
 
-	props: ['id'],
+	props: ['id', 'scrollY'],
 
 	data: function data() {
 		return {
@@ -44667,7 +44683,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			witch_poisoned: '',
 			has_save: true,
 			has_poison: true,
-			last_guard: 0
+			last_guard: 0,
+			actions: [],
+			night: 1,
+			deads: []
 		};
 	},
 	created: function created() {
@@ -44680,12 +44699,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			axios.get('/ajax/game/' + this.id).then(this.setGame);
 		},
 		setGame: function setGame(response) {
+			var _this = this;
+
 			this.game = response.data;
-			axios.get('/ajax/game/' + this.id + '/players').then(this.refresh);
+			axios.get('/ajax/game/' + this.id + '/players').then(this.refresh).catch(function (error) {
+				return _this.setGame(response);
+			});
+
+			_.forEach(this.game.roles, function (role) {
+				_.forEach(role.actions, function (action) {
+					if (!_.includes(this.actions, action)) this.actions.push(action);
+				}.bind(this));
+			}.bind(this));
+
+			this.night = this.game.nights ? this.game.nights[this.game.nights.length - 1].night : 1;
 		},
 		refresh: function refresh(response) {
+			var _this2 = this;
+
+			_.forEach(response.data, function (player) {
+				player.is_marked = false;
+			});
+
 			this.players = response.data;
-			axios.get('/ajax/game/' + this.id + '/judge').then(this.setJudge);
+
+			axios.get('/ajax/game/' + this.id + '/judge').then(this.setJudge).catch(function (error) {
+				return _this2.refresh(response);
+			});
+
+			this.propagateAction();
 		},
 		setJudge: function setJudge(response) {
 			this.judge = response.data;
@@ -44722,21 +44764,68 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 			var sequence = ["左", "右"];
 			this.sequence = sequence[_.random(0, sequence.length - 1)];
 		},
-		kill: function kill(index) {
+		kill: function kill(data) {
+			var index = data.seat - 1;
 			this.players[index].is_alive = 0;
 			this.just_killed = this.players[index].seat;
+
+			this.players[index].status = data.status;
+
+			this.deads.push(data.seat);
 
 			axios.post('/ajax/game/' + this.id + '/status', {
 				user_id: this.players[index].user_id,
 				alive: false
 			});
+
+			this.propagateAction();
 		},
-		revive: function revive(index) {
+		revive: function revive(data) {
+			var index = data.seat - 1;
 			this.players[index].is_alive = 1;
+			this.just_killed = this.players[index].seat;
 			axios.post('/ajax/game/' + this.id + '/status', {
 				user_id: this.players[index].user_id,
 				alive: true
 			});
+
+			this.players[index].status = data.status;
+
+			this.propagateAction();
+		},
+		mark: function mark(data) {
+			var index = data.seat - 1;
+
+			this.players[index].status = data.status;
+			this.players[index].is_marked = true;
+
+			this.propagateAction();
+		},
+		propagateAction: function propagateAction() {
+			var spliceIndex = [];
+
+			_.forEach(this.actions, function (action, key) {
+				if (_.filter(this.players, function (player) {
+					return player.status.includes(action.slug);
+				}.bind(this)).length >= action.count) {
+					spliceIndex.push(key);
+				}
+			}.bind(this));
+
+			// console.log("Need to remove");
+			// console.log(spliceIndex);
+
+			_.forEach(spliceIndex, function (index) {
+				this.actions.splice(index, 1);
+			}.bind(this));
+		},
+		nextNight: function nextNight() {
+			this.night++;
+			_.forEach(this.players, function (player) {
+				player.is_marked = false;
+			});
+
+			this.deads = [];
 		},
 		witchRevive: function witchRevive(index) {
 			this.witch_saved = true;
@@ -44885,11 +44974,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole'],
+    props: ['player', 'rolesSelection', 'gameId', 'is_concluded', 'selectedRole', 'highlighted', 'actions', 'night'],
     data: function data() {
         return {
             initialRole: false,
@@ -44897,23 +44984,60 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             status: "Alive",
             selecting_role: false,
             avatar: this.player.user.avatar_path,
-            role_override: false
+            role_override: false,
+            isWitchKill: false,
+            isWolfKill: false,
+            isHunterKill: false,
+            isAssassinKill: false,
+            isVoted: false
         };
     },
 
 
     methods: {
-        kill: function kill() {
+        kill: function kill(slug, id) {
+            var _this = this;
+
+            axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", { status: slug, action: id, night: this.night }).then(function (response) {
+                return _this.killSuccess(response);
+            }).catch(function (error) {
+                return _this.kill(slug, id);
+            });
+        },
+        killSuccess: function killSuccess(response) {
             this.status = "Dead";
             this.alive = false;
 
-            this.$emit('killed', this.player.seat);
+            this.$emit('killed', { seat: this.player.seat, status: response.data.status });
         },
-        revive: function revive() {
+        revive: function revive(slug, id) {
+            var _this2 = this;
+
+            axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", { status: slug, action: id, night: this.night }).then(function (response) {
+                return _this2.reviveSuccess(response);
+            }).catch(function (error) {
+                return _this2.revive(slug, id);
+            });
+        },
+        reviveSuccess: function reviveSuccess(response) {
             this.status = "Alive";
             this.alive = true;
 
-            this.$emit('revived', this.player.seat);
+            this.$emit('revived', { seat: this.player.seat, status: response.data.status });
+        },
+        mark: function mark(slug, id) {
+            var _this3 = this;
+
+            axios.post("/ajax/game/" + this.gameId + "/player/" + this.player.id + "/status", { status: slug, action: id, night: this.night }).then(function (response) {
+                return _this3.markSuccess(response);
+            }).catch(function (error) {
+                return _this3.mark(slug);
+            });
+        },
+        markSuccess: function markSuccess(response) {
+            this.status = "";
+
+            this.$emit('marked', { seat: this.player.seat, status: response.data.status });
         },
         select: function select(role) {
             this.initialRole = role;
@@ -44925,16 +45049,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.role_override = true;
         },
         getRole: function getRole() {
-            var _this = this;
+            var _this4 = this;
 
             axios.get('/ajax/game/' + this.gameId + '/player/role', {
                 params: {
                     user_id: this.player.user_id
                 }
             }).then(function (resp) {
-                return _this.initialRole = resp.data;
+                return _this4.initialRole = resp.data;
             }).catch(function (resp) {
-                return _this.getRole();
+                return _this4.getRole();
             });
         }
     },
@@ -44946,10 +45070,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
     computed: {
         classes: function classes() {
-            return [this.player.is_alive ? "alive" : "dead"];
+            return [this.player.is_alive ? "alive" : "dead", this.player.is_marked ? "mark_" + this.die : ""];
         },
         role: function role() {
             return this.selectedRole && !this.role_override ? this.selectedRole : this.initialRole;
+        },
+        histories: function histories() {
+            if (this.player.status) return this.player.status.split(",");
+            return "";
+        },
+        die: function die() {
+            if (this.player.status) return _.last(this.histories);
         }
     }
 
@@ -44963,90 +45094,148 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "player-card-container" }, [
-    _c("div", { staticClass: "player-card d-flex" }, [
-      _c("div", {
-        staticClass: "player-image",
-        style: "background-image: url(" + _vm.avatar + ");"
-      }),
-      _vm._v(" "),
-      _c("div", { staticClass: "player-details flex-1" }, [
+  return _c(
+    "div",
+    { staticClass: "player-card-container", class: _vm.classes },
+    [
+      _c("div", { staticClass: "player-card d-flex" }, [
         _c(
           "div",
           {
-            staticClass: "header",
-            style:
-              "background-image: url(/img/roles/" + this.role.slug + ".jpg);"
+            staticClass: "player-image",
+            style: "background-image: url(" + _vm.avatar + ");"
           },
           [
             _c("div", { staticClass: "overlay" }),
             _vm._v(" "),
-            _c("div", { staticClass: "name d-flex" }, [
-              _c("div", { staticClass: "circle" }, [
-                _vm._v(_vm._s(_vm.player.seat))
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "flex-1" }, [
-                _vm._v(
-                  _vm._s(_vm.player.user.name) +
-                    " - " +
-                    _vm._s(_vm.player.role.translated_name)
-                )
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "footer" }, [
-              this.player.is_alive && !_vm.is_concluded
-                ? _c(
-                    "button",
-                    { staticClass: "btn btn-danger", on: { click: _vm.kill } },
-                    [_vm._v("出局")]
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              !this.player.is_alive && !_vm.is_concluded
-                ? _c(
-                    "button",
-                    {
-                      staticClass: "btn btn-success",
-                      on: { click: _vm.revive }
-                    },
-                    [_vm._v("复活")]
-                  )
-                : _vm._e()
-            ])
+            _vm.die !== "N/A"
+              ? _c("img", {
+                  class: "marking " + _vm.die,
+                  attrs: { src: "/img/actions/" + _vm.die + ".png" }
+                })
+              : _vm._e()
           ]
         ),
         _vm._v(" "),
-        _c("div", { staticClass: "player-kill-badge" }, [
-          _vm.player.is_killed_by_poison
-            ? _c("div", {
-                staticClass: "img-circle",
-                staticStyle: { "background-image": "url(/img/roles/witch.jpg)" }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.player.is_killed_by_hunter
-            ? _c("div", {
-                staticClass: "img-circle",
-                staticStyle: {
-                  "background-image": "url(/img/roles/hunter.jpg)"
-                }
-              })
-            : _vm._e(),
-          _vm._v(" "),
-          _vm.player.is_killed_by_assassin
-            ? _c("div", {
-                staticClass: "img-circle",
-                staticStyle: {
-                  "background-image": "url(/img/roles/assassin.jpg)"
-                }
-              })
-            : _vm._e()
+        _c("div", { staticClass: "player-details flex-1 d-flex flex-col" }, [
+          _c(
+            "div",
+            {
+              staticClass: "header flex-1",
+              style:
+                "background-image: url(/img/roles/" + this.role.slug + ".jpg);"
+            },
+            [
+              _c("div", { staticClass: "overlay" }),
+              _vm._v(" "),
+              _c("div", { staticClass: "name d-flex" }, [
+                _c("div", { staticClass: "circle" }, [
+                  _vm._v(_vm._s(_vm.player.seat))
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "flex-1" }, [
+                  _vm._v(
+                    _vm._s(_vm.player.user.name) +
+                      " - " +
+                      _vm._s(_vm.player.role.translated_name)
+                  )
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "footer d-flex flex-wrap actions" },
+                [
+                  _vm._l(_vm.actions, function(action) {
+                    return _vm.player.is_alive &&
+                      !_vm.is_concluded &&
+                      action.type == "alive"
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-danger",
+                            on: {
+                              click: function($event) {
+                                _vm.kill(action.slug, action.id)
+                              }
+                            }
+                          },
+                          [
+                            _c("img", {
+                              attrs: { src: "/img/actions/" + action.icon }
+                            })
+                          ]
+                        )
+                      : _vm._e()
+                  }),
+                  _vm._v(" "),
+                  _vm._l(_vm.actions, function(action) {
+                    return !_vm.player.is_alive &&
+                      !_vm.is_concluded &&
+                      action.type == "dead"
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-success",
+                            on: {
+                              click: function($event) {
+                                _vm.revive(action.slug, action.id)
+                              }
+                            }
+                          },
+                          [
+                            _c("img", {
+                              attrs: { src: "/img/actions/" + action.icon }
+                            })
+                          ]
+                        )
+                      : _vm._e()
+                  }),
+                  _vm._v(" "),
+                  _vm._l(_vm.actions, function(action) {
+                    return _vm.player.is_alive &&
+                      !_vm.is_concluded &&
+                      action.type == "mark"
+                      ? _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-primary",
+                            on: {
+                              click: function($event) {
+                                _vm.mark(action.slug, action.id)
+                              }
+                            }
+                          },
+                          [
+                            _c("img", {
+                              attrs: { src: "/img/actions/" + action.icon }
+                            })
+                          ]
+                        )
+                      : _vm._e()
+                  })
+                ],
+                2
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "markings" },
+                _vm._l(_vm.histories, function(history) {
+                  return history !== "N/A"
+                    ? _c("img", {
+                        class: "marking " + history,
+                        attrs: { src: "/img/actions/" + history + ".png" }
+                      })
+                    : _vm._e()
+                })
+              )
+            ]
+          )
         ])
       ])
-    ])
-  ])
+    ]
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -45062,70 +45251,223 @@ if (false) {
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var disposed = false
+var normalizeComponent = __webpack_require__(0)
+/* script */
+var __vue_script__ = __webpack_require__(80)
+/* template */
+var __vue_template__ = __webpack_require__(81)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Game-Night.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] Game-Night.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-b8212984", Component.options)
+  } else {
+    hotAPI.reload("data-v-b8212984", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 80 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: ['night', 'scrollY', 'deads'],
+
+	data: function data() {
+		return {
+			nightClass: [],
+			originalTop: 0
+		};
+	},
+	mounted: function mounted() {
+		this.originalTop = this.$el.getBoundingClientRect().top;
+	},
+
+
+	methods: {
+		nextNight: function nextNight() {
+			this.$emit("next");
+		}
+	},
+
+	watch: {
+		scrollY: function scrollY(newVal) {
+			var rect = this.$el.getBoundingClientRect();
+			var newTop = this.scrollY + 20 - this.originalTop;
+
+			if (newTop > 0 && !this.nightClass.includes("fixed")) {
+				this.nightClass.push('fixed');
+			} else if (newTop <= 0) {
+				this.nightClass.splice(0);
+			}
+		}
+	}
+});
+
+/***/ }),
+/* 81 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "text-center night-info", class: _vm.nightClass },
+    [
+      _vm.night ? _c("h2", [_vm._v("第" + _vm._s(_vm.night) + "晚")]) : _vm._e(),
+      _vm._v(" "),
+      _vm.deads.length > 0
+        ? _c("h3", [_vm._v("死亡玩家： " + _vm._s(_vm.deads.join(",")))])
+        : _c("h3", [_vm._v("平安夜")]),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary",
+          on: {
+            click: function($event) {
+              _vm.$emit("next")
+            }
+          }
+        },
+        [_vm._v("下一晚")]
+      )
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-b8212984", module.exports)
+  }
+}
+
+/***/ }),
+/* 82 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "text-center" }, [
-      _c("h4", [
-        _vm._v("上帝: "),
-        _c("span", { domProps: { textContent: _vm._s(this.judge.name) } })
-      ]),
-      _vm._v(" "),
-      _vm._m(0),
-      _vm._v(" "),
-      _c(
-        "ul",
-        { staticClass: "list-inline instructions" },
-        _vm._l(_vm.orderedRoles, function(role, index) {
-          return role.id !== 5
-            ? _c("li", { key: role.id }, [
-                _c("img", {
-                  attrs: { src: role.avatar_path },
-                  on: {
-                    click: function($event) {
-                      _vm.showLines(index)
+    _c(
+      "div",
+      { staticClass: "text-center" },
+      [
+        _c("h4", [
+          _vm._v("上帝: "),
+          _c("span", { domProps: { textContent: _vm._s(this.judge.name) } })
+        ]),
+        _vm._v(" "),
+        _c("game-night", {
+          attrs: {
+            night: _vm.night,
+            "scroll-y": _vm.scrollY,
+            deads: _vm.deads
+          },
+          on: { next: _vm.nextNight }
+        }),
+        _vm._v(" "),
+        _vm._m(0),
+        _vm._v(" "),
+        _c(
+          "ul",
+          { staticClass: "list-inline instructions" },
+          _vm._l(_vm.orderedRoles, function(role, index) {
+            return role.id !== 5 && (role.id !== 20 || _vm.night == 1)
+              ? _c("li", { key: role.id }, [
+                  _c("img", {
+                    attrs: { src: role.avatar_path },
+                    on: {
+                      click: function($event) {
+                        _vm.showLines(index)
+                      }
                     }
-                  }
+                  })
+                ])
+              : _vm._e()
+          })
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          { staticClass: "flex flex-center justify-center text-center" },
+          [
+            _c("div", { staticClass: "text-left" }, [
+              _c("b", [
+                _vm._v("发言玩家: "),
+                _c("span", {
+                  domProps: { textContent: _vm._s(_vm.random + "号") }
                 })
+              ]),
+              _c("br"),
+              _vm._v(" "),
+              _c("b", [
+                _vm._v("发言顺序: "),
+                _c("span", { domProps: { textContent: _vm._s(_vm.sequence) } })
               ])
-            : _vm._e()
-        })
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        { staticClass: "flex flex-center justify-center text-center" },
-        [
-          _c("div", { staticClass: "text-left" }, [
-            _c("b", [
-              _vm._v("发言玩家: "),
-              _c("span", {
-                domProps: { textContent: _vm._s(_vm.random + "号") }
-              })
             ]),
-            _c("br"),
             _vm._v(" "),
-            _c("b", [
-              _vm._v("发言顺序: "),
-              _c("span", { domProps: { textContent: _vm._s(_vm.sequence) } })
-            ])
-          ]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-default ml-10",
-              on: { click: _vm.randomSelect }
-            },
-            [_vm._v("随机重选")]
-          )
-        ]
-      )
-    ]),
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-default ml-10",
+                on: { click: _vm.randomSelect }
+              },
+              [_vm._v("随机重选")]
+            )
+          ]
+        )
+      ],
+      1
+    ),
     _vm._v(" "),
-    _c("div", [
+    _c("div", { staticClass: "mt-2" }, [
       _c(
         "div",
         { staticClass: "d-flex flex-wrap" },
@@ -45137,23 +45479,18 @@ var render = function() {
               rolesSelection: _vm.game.roles,
               gameId: _vm.id,
               selectedRole: _vm.selectedRole[player.id],
-              is_concluded: _vm.game.is_concluded
+              is_concluded: _vm.game.is_concluded,
+              actions: _vm.actions,
+              night: _vm.night
             },
-            on: {
-              killed: function($event) {
-                _vm.kill(index)
-              },
-              revived: function($event) {
-                _vm.revive(index)
-              }
-            }
+            on: { killed: _vm.kill, revived: _vm.revive, marked: _vm.mark }
           })
         })
       )
     ]),
     _vm._v(" "),
     !_vm.game.is_concluded
-      ? _c("div", { staticClass: "row text-center" }, [
+      ? _c("div", { staticClass: "row text-center mb-2" }, [
           _c(
             "button",
             {
@@ -45233,30 +45570,6 @@ var render = function() {
               _vm._v(" "),
               _c("hr"),
               _vm._v(" "),
-              _c(this.orderedRoles[this.current_line].slug, {
-                tag: "component",
-                attrs: {
-                  game: _vm.game.id,
-                  justKilled: _vm.just_killed,
-                  source: _vm.initialSelectedRole[0].seat,
-                  witchSaved: _vm.witch_saved,
-                  witchPoisoned: _vm.witch_poisoned,
-                  has_save: _vm.has_save,
-                  has_poison: _vm.has_poison,
-                  last_guard: _vm.last_guard
-                },
-                on: {
-                  killed: _vm.kill,
-                  witchRevive: _vm.witchRevive,
-                  witchPoisoned: _vm.witchPoisoned,
-                  guarded: _vm.guarded,
-                  next: _vm.nextLine,
-                  back: function($event) {
-                    _vm.show_lines = false
-                  }
-                }
-              }),
-              _vm._v(" "),
               _c(
                 "button",
                 { staticClass: "btn btn-success", on: { click: _vm.nextLine } },
@@ -45287,7 +45600,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("p", [_c("b", [_vm._v("指示顺序:")])])
+    return _c("p", { staticClass: "mt-2" }, [_c("b", [_vm._v("指示顺序:")])])
   }
 ]
 render._withStripped = true
@@ -45300,15 +45613,15 @@ if (false) {
 }
 
 /***/ }),
-/* 80 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(81)
+var __vue_script__ = __webpack_require__(84)
 /* template */
-var __vue_template__ = __webpack_require__(82)
+var __vue_template__ = __webpack_require__(85)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -45346,7 +45659,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 81 */
+/* 84 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45427,7 +45740,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 82 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -45510,15 +45823,15 @@ if (false) {
 }
 
 /***/ }),
-/* 83 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(84)
+var __vue_script__ = __webpack_require__(87)
 /* template */
-var __vue_template__ = __webpack_require__(85)
+var __vue_template__ = __webpack_require__(88)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -45556,7 +45869,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 84 */
+/* 87 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45691,7 +46004,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 85 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -45850,15 +46163,15 @@ if (false) {
 }
 
 /***/ }),
-/* 86 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(87)
+var __vue_script__ = __webpack_require__(90)
 /* template */
-var __vue_template__ = __webpack_require__(88)
+var __vue_template__ = __webpack_require__(91)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -45896,7 +46209,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 87 */
+/* 90 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -45948,7 +46261,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 88 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -46026,15 +46339,15 @@ if (false) {
 }
 
 /***/ }),
-/* 89 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(90)
+var __vue_script__ = __webpack_require__(93)
 /* template */
-var __vue_template__ = __webpack_require__(91)
+var __vue_template__ = __webpack_require__(94)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46072,7 +46385,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 90 */
+/* 93 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46124,7 +46437,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 91 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -46208,15 +46521,15 @@ if (false) {
 }
 
 /***/ }),
-/* 92 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(93)
+var __vue_script__ = __webpack_require__(96)
 /* template */
-var __vue_template__ = __webpack_require__(94)
+var __vue_template__ = __webpack_require__(97)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46254,7 +46567,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 93 */
+/* 96 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46297,154 +46610,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 		onSuccess: function onSuccess(response) {
 			this.role = response.data == 'good' ? '好人' : '狼人';
-		}
-	}
-});
-
-/***/ }),
-/* 94 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "form-inline mb-10" }, [
-    _c("div", { staticClass: "form-group" }, [
-      _c("label", { attrs: { for: "source" } }, [_vm._v("查验")]),
-      _vm._v(" "),
-      _c("input", {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.target,
-            expression: "target"
-          }
-        ],
-        staticClass: "form-control",
-        attrs: { type: "number", id: "source" },
-        domProps: { value: _vm.target },
-        on: {
-          input: function($event) {
-            if ($event.target.composing) {
-              return
-            }
-            _vm.target = $event.target.value
-          }
-        }
-      })
-    ]),
-    _vm._v(" "),
-    _c("div", { domProps: { textContent: _vm._s(_vm.role) } }),
-    _vm._v(" "),
-    _c(
-      "button",
-      { staticClass: "btn btn-success", on: { click: _vm.confirm } },
-      [_vm._v("确定")]
-    )
-  ])
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-9cc70278", module.exports)
-  }
-}
-
-/***/ }),
-/* 95 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-var normalizeComponent = __webpack_require__(0)
-/* script */
-var __vue_script__ = __webpack_require__(96)
-/* template */
-var __vue_template__ = __webpack_require__(97)
-/* styles */
-var __vue_styles__ = null
-/* scopeId */
-var __vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\roles\\demon.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] demon.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-151d5fc1", Component.options)
-  } else {
-    hotAPI.reload("data-v-151d5fc1", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 96 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-	props: ['game', 'source'],
-	data: function data() {
-		return {
-			target: '',
-			power: '13',
-			role: ''
-		};
-	},
-
-
-	methods: {
-		confirm: function confirm() {
-			var _this = this;
-
-			axios.post('/ajax/powers/execute', {
-				game_id: this.game,
-				source: this.source,
-				target: this.target,
-				power: this.power
-			}).then(function (response) {
-				return _this.onSuccess(response);
-			});
-		},
-		onSuccess: function onSuccess(response) {
-			this.role = response.data == 'villager' ? '平民' : '神职';
 		}
 	}
 });
@@ -46499,7 +46664,7 @@ module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
   module.hot.accept()
   if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-151d5fc1", module.exports)
+     require("vue-hot-reload-api").rerender("data-v-9cc70278", module.exports)
   }
 }
 
@@ -46513,6 +46678,154 @@ var normalizeComponent = __webpack_require__(0)
 var __vue_script__ = __webpack_require__(99)
 /* template */
 var __vue_template__ = __webpack_require__(100)
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\roles\\demon.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key.substr(0, 2) !== "__"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] demon.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-151d5fc1", Component.options)
+  } else {
+    hotAPI.reload("data-v-151d5fc1", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 99 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+	props: ['game', 'source'],
+	data: function data() {
+		return {
+			target: '',
+			power: '13',
+			role: ''
+		};
+	},
+
+
+	methods: {
+		confirm: function confirm() {
+			var _this = this;
+
+			axios.post('/ajax/powers/execute', {
+				game_id: this.game,
+				source: this.source,
+				target: this.target,
+				power: this.power
+			}).then(function (response) {
+				return _this.onSuccess(response);
+			});
+		},
+		onSuccess: function onSuccess(response) {
+			this.role = response.data == 'villager' ? '平民' : '神职';
+		}
+	}
+});
+
+/***/ }),
+/* 100 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "form-inline mb-10" }, [
+    _c("div", { staticClass: "form-group" }, [
+      _c("label", { attrs: { for: "source" } }, [_vm._v("查验")]),
+      _vm._v(" "),
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.target,
+            expression: "target"
+          }
+        ],
+        staticClass: "form-control",
+        attrs: { type: "number", id: "source" },
+        domProps: { value: _vm.target },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.target = $event.target.value
+          }
+        }
+      })
+    ]),
+    _vm._v(" "),
+    _c("div", { domProps: { textContent: _vm._s(_vm.role) } }),
+    _vm._v(" "),
+    _c(
+      "button",
+      { staticClass: "btn btn-success", on: { click: _vm.confirm } },
+      [_vm._v("确定")]
+    )
+  ])
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-151d5fc1", module.exports)
+  }
+}
+
+/***/ }),
+/* 101 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(0)
+/* script */
+var __vue_script__ = __webpack_require__(102)
+/* template */
+var __vue_template__ = __webpack_require__(103)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46550,7 +46863,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46598,7 +46911,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -46655,15 +46968,15 @@ if (false) {
 }
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(102)
+var __vue_script__ = __webpack_require__(105)
 /* template */
-var __vue_template__ = __webpack_require__(103)
+var __vue_template__ = __webpack_require__(106)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46701,7 +47014,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46748,7 +47061,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 103 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -46800,15 +47113,15 @@ if (false) {
 }
 
 /***/ }),
-/* 104 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(105)
+var __vue_script__ = __webpack_require__(108)
 /* template */
-var __vue_template__ = __webpack_require__(106)
+var __vue_template__ = __webpack_require__(109)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46846,7 +47159,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 105 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46893,7 +47206,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 106 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -46945,15 +47258,15 @@ if (false) {
 }
 
 /***/ }),
-/* 107 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 var normalizeComponent = __webpack_require__(0)
 /* script */
-var __vue_script__ = __webpack_require__(108)
+var __vue_script__ = __webpack_require__(111)
 /* template */
-var __vue_template__ = __webpack_require__(109)
+var __vue_template__ = __webpack_require__(112)
 /* styles */
 var __vue_styles__ = null
 /* scopeId */
@@ -46991,7 +47304,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 108 */
+/* 111 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47038,7 +47351,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 109 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -47090,7 +47403,7 @@ if (false) {
 }
 
 /***/ }),
-/* 110 */
+/* 113 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

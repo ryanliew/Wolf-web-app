@@ -28,4 +28,6 @@ return [
     'crow'                  => '诽谤者',
     'knight'                => '骑士',
     'wolf-beauty'           => '狼美人',
+    'wolf-elder'            => '狼兄',
+    'wolf-little'           => '狼弟'
 ];

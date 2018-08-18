@@ -44,5 +44,14 @@ Vue.component('white-wolf', require("./roles/white-wolf.vue"));
 Vue.component('v-select', 'vue-select');
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    data: {
+    	scrollY: null
+    },
+
+    mounted() {
+    	window.addEventListener('scroll', (event) => {
+    		this.scrollY = Math.round(window.scrollY);
+    	});
+    }
 });

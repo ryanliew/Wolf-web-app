@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Game;
+use App\Night;
 use App\Role;
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AjaxController extends Controller
 {
@@ -104,6 +106,32 @@ class AjaxController extends Controller
         }
 
         return response(200);
+    }
+
+    public function setPlayerStatusInGame(Game $game, $player)
+    {
+        // Get the player in MN table
+        $game_player = DB::table('game_user')->select('status')->where('id', $player)->get()->first();
+
+        $new_status = $game_player->status . "," . request()->status;
+
+        // Status should be directly the come in status if nothing happened before
+        if( $game_player->status == "N/A" )
+        {
+            $new_status = request()->status;
+        }
+        
+        // Update the database
+        DB::table('game_user')->where('id', $player)->update(['status' => $new_status]);
+
+        // Persist the event
+        $game->nights()->create([
+            'night' => request()->night,
+            'target_id' => $player,
+            'action_id' => request()->action
+        ]);
+
+        return json_encode(['status' => $new_status]);
     }
 
     public function updateUserAvatar(User $user)

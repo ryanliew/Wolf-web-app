@@ -22,6 +22,7 @@
         "font-awesome": "^4.7.0",
         "font-awesome-sass": "^4.7.0",
         "vue-scroll": "^2.1.7",
-        "vue-select": "^2.4.0"
+        "vue-select": "^2.4.0",
+        "vue-sticky": "^3.3.4"
     }
 }

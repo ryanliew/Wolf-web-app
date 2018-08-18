@@ -9,7 +9,7 @@
     <div class="row">
         <div class="col-md-12">
 
-            <game-details :id="{{ $game->id }}"></game-details>
+            <game-details :id="{{ $game->id }}" :scroll-y="scrollY"></game-details>
 
         </div>
     </div>
